@@ -11,7 +11,7 @@ import re
 from .models import QualityField, QualityReport, TaskFields
 
 
-QUALITY_VERSION = "rules-v1"
+QUALITY_VERSION = "rules-v2"
 SCORED_FIELDS = (
     "context", "need", "data", "expectedResult", "successCriteria",
     "constraints", "users", "contact", "interactionFormat",
@@ -106,7 +106,14 @@ def informative_words(value: str) -> list[str]:
 
 
 def noise_reason(value: str) -> str | None:
+    value = normalized_text(value)
     tokens = words(value)
+    letters = "".join(tokens)
+    if letters and len(letters) <= 3 and not re.search(r"\d", value):
+        return "Нескольких букв недостаточно, чтобы объяснить содержание поля."
+    keyboard_rows = ("qwertyuiop", "asdfghjkl", "zxcvbnm", "йцукенгшщзхъ", "фывапролджэ", "ячсмитьбю", "абвгде", "abcdef", "xyz")
+    if any(len(token) == 3 and token != "про" and token in row for token in tokens for row in keyboard_rows):
+        return "Текст содержит короткий набор букв вместо конкретного описания."
     if re.search(r"asdf|qwert|zxcv|йцук|фыв|ячсм|lorem\s+ipsum", value):
         return "Текст похож на случайный набор символов или шаблон-заполнитель."
     if re.search(r"([a-zа-яё])\1{3,}|([a-zа-яё]{2,4})\1{2,}", value):
@@ -121,6 +128,19 @@ def noise_reason(value: str) -> str | None:
             return "Повторение одних и тех же фраз не добавляет проверяемых сведений."
     if tokens and all(not re.search(r"[aeiouyаеёиоуыэюя]", word) for word in tokens if len(word) >= 4) and any(len(word) >= 6 for word in tokens):
         return "Не удаётся распознать осмысленное описание в наборе символов."
+    return None
+
+
+def hard_quality_failure(value: str) -> str | None:
+    """Cheap input floor shared with semantic review; never a semantic verdict."""
+    normalized = normalized_text(value)
+    if not has_content(normalized):
+        return "Поле пустое или содержит явную заглушку."
+    reason = noise_reason(normalized)
+    if reason:
+        return reason
+    if VAGUE.fullmatch(normalized) or not informative_words(normalized):
+        return "Общая формулировка не содержит конкретных сведений для этого раздела."
     return None
 
 

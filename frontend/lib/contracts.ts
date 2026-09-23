@@ -20,8 +20,8 @@ export type TaskInput = {
   requiredSkills: string[];
 };
 export type RatingItem = { key: string; label: string; earned: number; max: number; missing: string[] };
-export type QualityField = { field: string; status: "missing" | "needs_work" | "ready"; message: string; suggestion: string };
-export type QualityReport = { version: string; mode: "rules"; fields: QualityField[]; eligibleFields: string[]; summary: string };
+export type QualityField = { field: string; status: "missing" | "needs_work" | "ready"; message: string; suggestion: string; evidence?: string | null };
+export type QualityReport = { version: string; mode: "rules" | "openai"; fields: QualityField[]; eligibleFields: string[]; summary: string; warnings?: string[]; model?: string | null };
 export type Rating = { score: number; level: Readiness; breakdown: RatingItem[]; missingFields: string[]; quality?: QualityReport };
 export type Task = TaskInput & {
   id: string;
@@ -43,12 +43,18 @@ export type Team = { id: string; sourceId?: string | null; name: string; skills:
 export type ProposalStatus = "submitted" | "accepted" | "rejected";
 export type ProposalInput = { teamId: string; idea: string; plan: string[]; durationDays: number; prototypeUrl: string; assumptions: string[] };
 export type ProposalAttachment = { id: string; name: string; size: number; mediaType: "application/pdf"; createdAt: string };
+export type ProjectCompletion = { confirmedAt: string; summary: string; pointsAwarded: number };
 export type Proposal = ProposalInput & {
   id: string; sourceId?: string | null; taskId: string; team: Team;
   prototypeIsPlaceholder: boolean; status: ProposalStatus; decisionComment: string;
   createdAt: string; updatedAt: string; taskTitle: string;
   attachments: ProposalAttachment[];
+  completion?: ProjectCompletion | null;
 };
+export type RewardSlot = "background" | "poster" | "plant" | "lamp";
+export type RewardItem = { id: string; name: string; description: string; cost: number; slot: RewardSlot; style: string };
+export type RewardTransaction = { id: string; kind: "project_reward" | "purchase"; amount: number; label: string; createdAt: string; proposalId: string | null; itemId: string | null };
+export type TeamRewards = { teamId: string; balance: number; totalEarned: number; completedProjects: number; items: RewardItem[]; ownedItemIds: string[]; equipped: Record<RewardSlot, string | null>; history: RewardTransaction[] };
 export type Quest = { task: Task; matchedSkills: string[]; matchedInterests: string[]; decision: "saved" | "dismissed" | null };
 export type AIMode = "local_stub" | "openai";
 export type AIQuestion = { id: string; field: keyof TaskFields; question: string };

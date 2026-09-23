@@ -11,10 +11,13 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
 from .domain import calculate_rating
+from .config import load_local_env
+from .semantic_quality import SemanticReviewError, evaluate_semantic, semantic_configured
 from .ai import router as ai_router
 from .models import DecisionInput, Quest, Rating, RatingInput, Readiness, SkillsInput, StudentProfile, Task, TaskInput
 from .store import Store, StoreError
 from .proposals import router as proposals_router
+from .rewards import router as rewards_router
 
 DemoRole = Annotated[str | None, Header(alias="X-Demo-Role")]
 
@@ -30,6 +33,7 @@ def require_student(role: DemoRole = None) -> None:
 
 
 def create_app(db_path: str | Path | None = None) -> FastAPI:
+    load_local_env()
     resolved_path = db_path or os.environ.get("APP_DB_PATH") or Path(__file__).resolve().parents[1] / "data" / "hackalem.sqlite3"
     store = Store(resolved_path)
 
@@ -41,6 +45,7 @@ def create_app(db_path: str | Path | None = None) -> FastAPI:
     application = FastAPI(title="HackAlem · часть 1", version="1.0.0", lifespan=lifespan)
     application.include_router(ai_router, dependencies=[Depends(require_business)])
     application.include_router(proposals_router)
+    application.include_router(rewards_router)
     application.state.store = store
     application.add_middleware(
         CORSMiddleware,
@@ -52,6 +57,17 @@ def create_app(db_path: str | Path | None = None) -> FastAPI:
     @application.exception_handler(StoreError)
     async def handle_store_error(request: Request, error: StoreError):
         return JSONResponse(status_code=error.status_code, content={"detail": error.detail})
+
+    @application.exception_handler(SemanticReviewError)
+    async def handle_semantic_error(request: Request, error: SemanticReviewError):
+        return JSONResponse(status_code=503, content={"detail": str(error)})
+
+    @application.get("/api/ai/status", dependencies=[Depends(require_business)])
+    def ai_status():
+        return {
+            "configured": semantic_configured(),
+            "model": os.environ.get("OPENAI_RATING_MODEL", "").strip() or os.environ.get("OPENAI_MODEL", "").strip() or "gpt-4.1-mini",
+        }
 
     @application.get("/api/health")
     def health():
@@ -90,15 +106,23 @@ def create_app(db_path: str | Path | None = None) -> FastAPI:
 
     @application.post("/api/tasks/{task_id}/confirm", response_model=Task, dependencies=[Depends(require_business)])
     def confirm_task(task_id: UUID):
-        return store.confirm_task(str(task_id))
+        snapshot = store.get_task(str(task_id), business=True)
+        # Network calls happen before taking the SQLite write lock. A concurrent
+        # edit invalidates this review rather than confirming different fields.
+        quality = evaluate_semantic(snapshot.fields) if semantic_configured() else None
+        return store.confirm_task(str(task_id), quality=quality, expected_revision=snapshot.revision)
 
     @application.post("/api/tasks/{task_id}/publish", response_model=Task, dependencies=[Depends(require_business)])
     def publish_task(task_id: UUID):
-        return store.publish_task(str(task_id))
+        return store.publish_task(str(task_id), require_semantic=semantic_configured())
 
     @application.post("/api/rating/preview", response_model=Rating)
     def preview_rating(rating_input: RatingInput):
         return calculate_rating(rating_input.fields)
+
+    @application.post("/api/rating/review", response_model=Rating, dependencies=[Depends(require_business)])
+    def review_rating(rating_input: RatingInput):
+        return calculate_rating(rating_input.fields, quality=evaluate_semantic(rating_input.fields))
 
     @application.get("/api/profiles", response_model=list[StudentProfile])
     def profiles():

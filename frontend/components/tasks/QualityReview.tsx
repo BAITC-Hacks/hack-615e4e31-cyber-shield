@@ -15,8 +15,8 @@ export default function QualityReview({ report, labels }: { report: QualityRepor
     .sort((a, b) => Number(b.status === "needs_work") - Number(a.status === "needs_work"));
   const needsWork = issues.filter((item) => item.status === "needs_work").length;
   return <div className={styles.review} aria-label="Проверка качества описания">
-    <div className={styles.heading}><ScanText size={17} aria-hidden="true" /><strong>Проверка содержания</strong></div>
-    <p className={styles.summary}>Достаточно конкретны {report.eligibleFields.length} из {report.fields.length} разделов. Баллы за них начислятся после подтверждения.</p>
+    <div className={styles.heading}><ScanText size={17} aria-hidden="true" /><strong>{report.mode === "openai" ? "Смысл проверен AI" : "Проверка по правилам"}</strong></div>
+    <p className={styles.summary}>Проверку прошли {report.eligibleFields.length} из {report.fields.length} разделов. Для начисления баллов также требуется подтверждение бизнеса.</p>
     {issues.length > 0 ? <details className={styles.details} open={needsWork > 0}>
       <summary>Что уточнить · {issues.length}</summary>
       <ul className={styles.issues}>{issues.map((item) => <li key={item.field}>
@@ -25,6 +25,7 @@ export default function QualityReview({ report, labels }: { report: QualityRepor
         {item.suggestion && <p>{item.suggestion}</p>}
       </li>)}</ul>
     </details> : <p className={styles.ready}><CheckCircle2 size={15} aria-hidden="true" /> Все оцениваемые поля прошли проверку.</p>}
-    <p className={styles.note}>Проверка по правилам помогает найти неточности. Смысл и достоверность сведений подтверждает бизнес.</p>
+    {report.warnings?.map((warning) => <p className={styles.note} key={warning}>{warning}</p>)}
+    <p className={styles.note}>{report.mode === "openai" ? "AI оценивает смысл и конкретность, но может ошибаться. Достоверность сведений и публикацию подтверждает бизнес." : "Это предварительная проверка формулировок без внешней модели. Она не гарантирует смысловую корректность."}</p>
   </div>;
 }

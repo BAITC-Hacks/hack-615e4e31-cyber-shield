@@ -182,6 +182,8 @@ class ProposalRepository:
             if row is None:
                 raise StoreError(404, "Отклик не найден")
             proposal = self._proposal(connection, row)
+            if proposal.completion is not None:
+                raise StoreError(409, "Проект уже завершён: решение по этому отклику нельзя изменить")
             proposal.status = decision.status
             proposal.decisionComment = decision.comment
             proposal.updatedAt = utc_now()

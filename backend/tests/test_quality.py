@@ -47,6 +47,14 @@ def test_short_concrete_constraints_are_not_rejected_for_length():
     assert report_for("constraints", "Только Python").status == "ready"
 
 
+@pytest.mark.parametrize("value", ["а", "аб", "абв", "ыва", "qwe", "Только abc", "Только ыва"])
+def test_few_letters_and_keyboard_fragments_never_earn_points(value):
+    fields = TaskFields(**empty_fields(**{name: value for name in TaskFields.model_fields}))
+    result = calculate_rating(fields)
+    assert result.score == 0
+    assert result.quality.version == "rules-v2"
+
+
 def test_technical_identifiers_and_function_words_may_repeat_in_real_criteria():
     text = (
         "Загружаются 60 из 60 корректных строк; правильно обработаны 10 из 10 контрольных примеров; "

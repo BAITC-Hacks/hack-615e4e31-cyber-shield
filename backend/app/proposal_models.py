@@ -63,6 +63,16 @@ class ProposalAttachment(APIModel):
     createdAt: str
 
 
+class ProposalCompletion(APIModel):
+    confirmedAt: str
+    summary: str
+    pointsAwarded: int
+
+
+class ProposalCompletionInput(APIModel):
+    summary: Annotated[str, StringConstraints(strip_whitespace=True, min_length=10, max_length=2000)]
+
+
 class Proposal(APIModel):
     id: str
     sourceId: str | None = None
@@ -81,3 +91,4 @@ class Proposal(APIModel):
     updatedAt: str
     taskTitle: str
     attachments: list[ProposalAttachment] = Field(default_factory=list)
+    completion: ProposalCompletion | None = None

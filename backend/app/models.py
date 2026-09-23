@@ -64,14 +64,17 @@ class QualityField(APIModel):
     status: Literal["missing", "needs_work", "ready"]
     message: str
     suggestion: str
+    evidence: str | None = None
 
 
 class QualityReport(APIModel):
     version: str
-    mode: Literal["rules"] = "rules"
+    mode: Literal["rules", "openai"] = "rules"
     fields: list[QualityField]
     eligibleFields: list[str]
     summary: str
+    warnings: list[str] = Field(default_factory=list)
+    model: str | None = None
 
 
 class Rating(APIModel):

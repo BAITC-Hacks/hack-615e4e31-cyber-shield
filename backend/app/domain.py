@@ -1,6 +1,6 @@
 """Pure readiness rules; no AI, persistence or team assignment."""
 
-from .models import Rating, RatingItem, Readiness, TaskFields
+from .models import QualityReport, Rating, RatingItem, Readiness, TaskFields
 from .quality import assess_quality, has_content
 
 FIELD_LABELS = {
@@ -36,10 +36,12 @@ def readiness(score: int) -> Readiness:
     return "priority"
 
 
-def calculate_rating(fields: TaskFields, *, confirmed: bool = True, confirmed_fields: list[str] | None = None) -> Rating:
+def calculate_rating(fields: TaskFields, *, confirmed: bool = True, confirmed_fields: list[str] | None = None, quality: QualityReport | None = None) -> Rating:
     """Preview defaults to confirmed=True; draft callers explicitly pass False."""
-    quality = assess_quality(fields)
-    eligible = set(quality.eligibleFields)
+    quality = quality if quality is not None else assess_quality(fields)
+    # The model can classify fields, but it cannot provide numeric weights or
+    # award points by inserting an arbitrary name into eligibleFields.
+    eligible = {item.field for item in quality.fields if item.status == "ready"}
     field_quality = {item.field: item for item in quality.fields}
     breakdown: list[RatingItem] = []
     missing_fields: list[str] = []

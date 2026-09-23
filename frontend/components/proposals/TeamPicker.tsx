@@ -7,7 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { api } from "@/lib/api";
 import type { Team } from "@/lib/contracts";
 
-export default function TeamPicker({ value, onChange, disabled = false }: { value: string; onChange: (id: string) => void; disabled?: boolean }) {
+export default function TeamPicker({ value, onChange, disabled = false, purpose = "proposals" }: { value: string; onChange: (id: string) => void; disabled?: boolean; purpose?: "proposals" | "rewards" }) {
   const id = useId();
   const [retry, setRetry] = useState(0);
   const [result, setResult] = useState<{ key: number; teams: Team[]; error: string } | null>(null);
@@ -21,10 +21,10 @@ export default function TeamPicker({ value, onChange, disabled = false }: { valu
     return () => { cancelled = true; };
   }, [retry]);
   return <section className="alem-team-picker" aria-label="Выбор тестовой команды">
-    <label htmlFor={id}><Users size={17} />Тестовая команда для отклика</label>
+    <label htmlFor={id}><Users size={17} />{purpose === "rewards" ? "Пространство тестовой команды" : "Тестовая команда для отклика"}</label>
     {loading ? <p className="alem-proposal-loading" role="status"><Loader2 size={16} className="ha-task-spin" />Загружаем команды…</p> : error ? <div className="alem-proposal-error" role="alert"><p>{error}</p><Button type="button" variant="outline" size="sm" onClick={() => setRetry((current) => current + 1)} disabled={disabled}><RotateCcw size={14} />Повторить</Button></div> : <Select value={selected ? value : ""} onValueChange={onChange} disabled={disabled || !teams.length}><SelectTrigger id={id}><SelectValue placeholder="Выберите команду" /></SelectTrigger><SelectContent>{teams.map((team) => <SelectItem key={team.id} value={team.id}>{team.name}</SelectItem>)}</SelectContent></Select>}
     {!loading && !error && !teams.length && <p className="alem-proposal-muted">Тестовые команды пока не добавлены.</p>}
-    <p className="alem-proposal-hint">Команды отдельны от личных профилей студентов. Выберите, от чьего имени отправить предложение.</p>
+    <p className="alem-proposal-hint">{purpose === "rewards" ? "Баллы, коллекция и оформление принадлежат выбранной команде." : "Команды отдельны от личных профилей студентов. Выберите, от чьего имени отправить предложение."}</p>
     {selected && <div className="alem-team-summary"><strong>{selected.name}</strong><div className="alem-proposal-tags">{selected.skills.map((skill) => <span key={skill}>{skill}</span>)}</div><p><span>Технологии:</span> {selected.technologies.join(", ") || "Не указаны"}</p><p><span>Интересы:</span> {selected.interests.join(", ") || "Не указаны"}</p></div>}
   </section>;
 }

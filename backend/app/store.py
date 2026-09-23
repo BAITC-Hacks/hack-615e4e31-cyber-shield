@@ -8,7 +8,7 @@ from typing import Iterator, Literal
 from uuid import uuid4
 
 from .domain import calculate_rating
-from .models import Quest, Readiness, StudentProfile, Task, TaskInput
+from .models import QualityReport, Quest, Readiness, StudentProfile, Task, TaskInput
 
 DEMO_OWNER = "business-demo"
 
@@ -118,6 +118,9 @@ class Store:
             from .proposals import initialize_proposals
 
             initialize_proposals(connection)
+            from .rewards import initialize_rewards
+
+            initialize_rewards(connection)
 
     @staticmethod
     def _owned_row(connection: sqlite3.Connection, task_id: str) -> sqlite3.Row:
@@ -206,24 +209,29 @@ class Store:
             ))
         return task
 
-    def confirm_task(self, task_id: str) -> Task:
+    def confirm_task(self, task_id: str, *, quality: QualityReport | None = None, expected_revision: int | None = None) -> Task:
         with self.connection(write=True) as connection:
             task = Task.model_validate_json(self._owned_row(connection, task_id)["draft_json"])
-            if not task.confirmed:
+            if expected_revision is not None and task.revision != expected_revision:
+                raise StoreError(409, "Карточка изменилась во время проверки. Откройте текущую версию и подтвердите её снова")
+            if not task.confirmed or quality is not None:
                 task.confirmed = True
                 task.confirmedFields = list(task.fields.model_dump())
-                task.rating = calculate_rating(task.fields)
+                task.rating = calculate_rating(task.fields, quality=quality)
+                task.previewRating = task.rating.model_copy(deep=True)
                 task.updatedAt = utc_now()
                 connection.execute("UPDATE tasks SET draft_json = ? WHERE id = ? AND owner_id = ?", (
                     task.model_dump_json(), task_id, DEMO_OWNER,
                 ))
         return task
 
-    def publish_task(self, task_id: str) -> Task:
+    def publish_task(self, task_id: str, *, require_semantic: bool = False) -> Task:
         with self.connection(write=True) as connection:
             task = Task.model_validate_json(self._owned_row(connection, task_id)["draft_json"])
             if not task.confirmed:
                 raise StoreError(409, "Сначала подтвердите текущую версию карточки")
+            if require_semantic and (task.rating.quality is None or task.rating.quality.mode != "openai"):
+                raise StoreError(409, "Подключена AI-проверка. Повторно подтвердите карточку, чтобы проверить смысл перед публикацией")
             if not task.fields.title.strip():
                 raise StoreError(422, "Перед публикацией укажите название задачи")
             task.published = True

@@ -1,4 +1,4 @@
-import type { AIAnalysis, AIAnswer, AICardResult, Proposal, ProposalInput, ProposalStatus, Quest, Rating, Role, StudentProfile, Task, TaskFields, TaskInput, Team } from "./contracts";
+import type { AIAnalysis, AIAnswer, AICardResult, Proposal, ProposalInput, ProposalStatus, Quest, Rating, RewardSlot, Role, StudentProfile, Task, TaskFields, TaskInput, Team, TeamRewards } from "./contracts";
 
 async function request<T>(path: string, options: RequestInit = {}, role?: Role): Promise<T> {
   let response: Response;
@@ -24,9 +24,11 @@ export const api = {
   getTask: (id: string, business = false) => request<Task>(`/tasks/${encodeURIComponent(id)}${business ? "?view=business" : ""}`, {}, business ? "business" : undefined),
   createTask: (input: TaskInput) => request<Task>("/tasks", { method: "POST", body: JSON.stringify(input) }, "business"),
   updateTask: (id: string, input: TaskInput) => request<Task>(`/tasks/${encodeURIComponent(id)}`, { method: "PUT", body: JSON.stringify(input) }, "business"),
-  confirmTask: (id: string) => request<Task>(`/tasks/${encodeURIComponent(id)}/confirm`, { method: "POST" }, "business"),
+  confirmTask: (id: string) => request<Task>(`/tasks/${encodeURIComponent(id)}/confirm`, { method: "POST", signal: AbortSignal.timeout(35000) }, "business"),
   publishTask: (id: string) => request<Task>(`/tasks/${encodeURIComponent(id)}/publish`, { method: "POST" }, "business"),
   previewRating: (fields: TaskFields) => request<Rating>("/rating/preview", { method: "POST", body: JSON.stringify({ fields }) }),
+  reviewRating: (fields: TaskFields) => request<Rating>("/rating/review", { method: "POST", body: JSON.stringify({ fields }), signal: AbortSignal.timeout(35000) }, "business"),
+  ratingStatus: () => request<{ configured: boolean; model: string }>("/ai/status", {}, "business"),
   analyzeTask: (description: string, fields: TaskFields) => request<AIAnalysis>("/ai/analyze", { method: "POST", body: JSON.stringify({ description, fields }) }, "business"),
   buildTaskCard: (description: string, fields: TaskFields, answers: AIAnswer[]) => request<AICardResult>("/ai/build-card", { method: "POST", body: JSON.stringify({ description, fields, answers }) }, "business"),
   profiles: () => request<StudentProfile[]>("/profiles"),
@@ -52,6 +54,10 @@ export const api = {
   teamProposals: (teamId: string) => request<Proposal[]>(`/proposals?teamId=${encodeURIComponent(teamId)}`, {}, "student"),
   taskProposals: (taskId: string) => request<Proposal[]>(`/proposals?taskId=${encodeURIComponent(taskId)}`, {}, "business"),
   decideProposal: (id: string, status: ProposalStatus, comment: string) => request<Proposal>(`/proposals/${encodeURIComponent(id)}/decision`, { method: "PUT", body: JSON.stringify({ status, comment }) }, "business"),
+  completeProposal: (id: string, summary: string) => request<Proposal>(`/proposals/${encodeURIComponent(id)}/complete`, { method: "POST", body: JSON.stringify({ summary }) }, "business"),
+  teamRewards: (teamId: string) => request<TeamRewards>(`/teams/${encodeURIComponent(teamId)}/rewards`, {}, "student"),
+  purchaseReward: (teamId: string, itemId: string) => request<TeamRewards>(`/teams/${encodeURIComponent(teamId)}/rewards/purchase`, { method: "POST", body: JSON.stringify({ itemId }) }, "student"),
+  equipReward: (teamId: string, slot: RewardSlot, itemId: string | null) => request<TeamRewards>(`/teams/${encodeURIComponent(teamId)}/rewards/equip`, { method: "PUT", body: JSON.stringify({ slot, itemId }) }, "student"),
   updateSkills: (id: string, skills: string[]) => request<StudentProfile>(`/profiles/${encodeURIComponent(id)}/skills`, { method: "PUT", body: JSON.stringify({ skills }) }, "student"),
   quests: (profileId: string) => request<Quest[]>(`/quests?profileId=${encodeURIComponent(profileId)}`),
   saved: (profileId: string) => request<Task[]>(`/saved?profileId=${encodeURIComponent(profileId)}`),

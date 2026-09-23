@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState, type FormEvent } from "react";
-import { ArrowLeft, ArrowRight, Check, ChevronRight, Loader2, Save, Send } from "lucide-react";
+import { ArrowLeft, ArrowRight, Check, ChevronRight, Loader2, Save, ScanText, Send } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
@@ -13,6 +13,7 @@ import { EMPTY_FIELDS, SKILLS, TOPICS, type Rating, type Task, type TaskFields, 
 import RatingPanel from "./RatingPanel";
 import { FieldQualityHint } from "./QualityReview";
 import AIAssistant from "./AIAssistant";
+import qualityStyles from "./quality.module.css";
 
 type Props = { task: Task | null; onClose: () => void; onSaved: (task: Task) => void; onDirtyChange?: (dirty: boolean) => void };
 const STEPS = ["Основа задачи", "Аудитория и данные", "Результат", "Условия и связь"];
@@ -49,6 +50,11 @@ function TaskEditorForm({ task, onClose, onSaved, onDirtyChange }: Props) {
   const [preview, setPreview] = useState<Rating | null>(task?.previewRating ?? null);
   const [previewPending, setPreviewPending] = useState(true);
   const [previewError, setPreviewError] = useState<string | null>(null);
+  const [semanticStatus, setSemanticStatus] = useState<{ configured: boolean; model: string } | null>(null);
+  const [semanticStatusError, setSemanticStatusError] = useState(false);
+  const [reviewing, setReviewing] = useState(false);
+  const [reviewError, setReviewError] = useState<string | null>(null);
+  const reviewLock = useRef(false);
   const [baseline, setBaseline] = useState(() => fingerprint({ fields: task?.fields ?? EMPTY_FIELDS, company: task?.company ?? "", topic: task?.topic ?? "", requiredSkills: task?.requiredSkills ?? [] }));
   const [exitOpen, setExitOpen] = useState(false);
   const [aiPending, setAiPending] = useState(false);
@@ -69,6 +75,13 @@ function TaskEditorForm({ task, onClose, onSaved, onDirtyChange }: Props) {
   useEffect(() => {
     mounted.current = true;
     return () => { mounted.current = false; requestVersion.current += 1; };
+  }, []);
+
+  useEffect(() => {
+    let cancelled = false;
+    api.ratingStatus().then((status) => { if (!cancelled) setSemanticStatus(status); })
+      .catch(() => { if (!cancelled) setSemanticStatusError(true); });
+    return () => { cancelled = true; };
   }, []);
 
   useEffect(() => {
@@ -93,6 +106,7 @@ function TaskEditorForm({ task, onClose, onSaved, onDirtyChange }: Props) {
     requestVersion.current += 1;
     setPreviewPending(true);
     setPreviewError(null);
+    setReviewError(null);
     setFields((current) => ({ ...current, [key]: value }));
     changed();
   }
@@ -105,10 +119,32 @@ function TaskEditorForm({ task, onClose, onSaved, onDirtyChange }: Props) {
     requestVersion.current += 1;
     setPreviewPending(true);
     setPreviewError(null);
+    setReviewError(null);
     setFields({ ...proposedFields });
     setStep(0);
     changed();
     return true;
+  }
+  async function reviewMeaning() {
+    if (reviewLock.current || savingLock.current || previewPending) return;
+    reviewLock.current = true;
+    const version = ++requestVersion.current;
+    setReviewing(true);
+    setReviewError(null);
+    try {
+      const result = await api.reviewRating(fields);
+      if (mounted.current && version === requestVersion.current) {
+        setPreview(result);
+        setPreviewError(null);
+      }
+    } catch (cause) {
+      if (mounted.current && version === requestVersion.current) {
+        setReviewError(cause instanceof Error ? cause.message : "Не удалось проверить смысл. Повторите попытку.");
+      }
+    } finally {
+      reviewLock.current = false;
+      if (mounted.current) setReviewing(false);
+    }
   }
   function markSaved(input: TaskInput) {
     setBaseline(fingerprint(input));
@@ -131,6 +167,7 @@ function TaskEditorForm({ task, onClose, onSaved, onDirtyChange }: Props) {
 
   async function save(publish: boolean) {
     if (savingLock.current) return;
+    if (reviewLock.current) { setError("Дождитесь завершения AI-проверки перед сохранением."); return; }
     if (publish && !confirmed) { setError("Подтвердите сведения в карточке перед публикацией."); return; }
     if (publish && !fields.title.trim()) { setStep(0); setError("Для публикации укажите название задачи."); return; }
     savingLock.current = true;
@@ -144,7 +181,7 @@ function TaskEditorForm({ task, onClose, onSaved, onDirtyChange }: Props) {
       savedId.current = result.id;
       saved = true;
       if (publish) {
-        setSavePhase("Подтверждаем сведения…");
+        setSavePhase(semanticStatus?.configured ? "Проверяем смысл с AI и подтверждаем сведения…" : "Подтверждаем сведения…");
         result = await api.confirmTask(result.id);
         setSavePhase("Публикуем в каталоге…");
         result = await api.publishTask(result.id);
@@ -230,7 +267,18 @@ function TaskEditorForm({ task, onClose, onSaved, onDirtyChange }: Props) {
         {saving && <p className="ha-task-inline-status" role="status">{savePhase}</p>}
         <p className="ha-task-footnote">Не всё известно? Сохраните черновик или опубликуйте задачу с неполным описанием. Рейтинг подскажет, что можно дополнить.</p>
       </form>
-      <aside className="ha-task-rating-column"><RatingPanel rating={preview} preview loading={previewPending} error={previewError} /></aside>
+      <aside className="ha-task-rating-column">
+        <div className={qualityStyles.aiControl}>
+          <strong><ScanText size={17} /> Проверка смысла</strong>
+          <p>{semanticStatus?.configured ? "AI проверяет содержание и связь разделов. При публикации проверка обязательна; исправленный текст оценивается заново." : semanticStatusError ? "Не удалось узнать состояние AI. Повторите открытие редактора." : semanticStatus ? "AI пока не подключён. Ниже — предварительная проверка по правилам, она не заменяет оценку смысла." : "Проверяем подключение AI…"}</p>
+          <Button type="button" variant="outline" onClick={() => void reviewMeaning()} disabled={!semanticStatus?.configured || reviewing || previewPending || !!saving}>
+            {reviewing ? <Loader2 size={16} className="ha-task-spin" /> : <ScanText size={16} />}{reviewing ? "Проверяем смысл…" : "Проверить смысл с AI"}
+          </Button>
+          {semanticStatus?.configured && <small>Во внешний AI отправляется текст карточки; контактное поле и файлы не передаются. Запросы используют ваш API.</small>}
+          {reviewError && <p role="alert" className="ha-task-error">{reviewError} Предварительные баллы ниже не означают, что AI одобрил описание.</p>}
+        </div>
+        <RatingPanel rating={preview} preview loading={previewPending || reviewing} error={previewError} />
+      </aside>
     </div>
     <AlertDialog open={exitOpen} onOpenChange={setExitOpen}>
       <AlertDialogContent className="ha-task-exit-dialog">

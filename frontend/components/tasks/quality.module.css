@@ -15,3 +15,8 @@
 .fieldHint svg { flex-shrink: 0; margin-top: 2px; }
 .ready { color: #347657; display: flex; align-items: flex-start; gap: 6px; font-size: 12px; line-height: 1.6; }
 .needsWork, .issues span.needsWork { color: #986322; }
+.aiControl { display: grid; gap: 12px; padding: 18px; margin-bottom: 16px; border: 1px solid #dfe3f5; border-radius: 16px; background: #f2f3fc; color: #1a2250; }
+.aiControl > strong { display: flex; align-items: center; gap: 8px; font-size: 14px; }
+.aiControl > p { margin: 0; font-size: 12px; line-height: 1.65; }
+.aiControl > small { color: #65718d; font-size: 11px; line-height: 1.6; }
+.aiControl > button { white-space: normal; height: auto; min-height: 38px; }

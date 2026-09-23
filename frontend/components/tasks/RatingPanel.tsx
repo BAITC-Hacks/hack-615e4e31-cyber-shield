@@ -26,7 +26,7 @@ export default function RatingPanel({ rating, preview = false, loading = false, 
       </div>
       <Progress value={available ? rating.score : 0} aria-label="Рейтинг готовности" className="ha-task-progress" />
       <p className="ha-task-muted ha-task-rating-note">
-        {preview ? "После подтверждения" : "Начисленные баллы"}
+        {preview ? rating?.quality?.mode === "openai" ? "После AI-проверки и подтверждения" : "Предварительно · по правилам" : "Начисленные баллы"}
       </p>
       {loading && <p className="ha-task-inline-status" role="status"><Loader2 size={15} className="ha-task-spin" /> Пересчитываем рейтинг…</p>}
       {error && <p className="ha-task-error" role="alert">{error}</p>}

@@ -11,6 +11,14 @@ BACKEND_ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(BACKEND_ROOT))
 
 
+@pytest.fixture(autouse=True)
+def offline_environment(monkeypatch):
+    # Tests must never use the developer's .env or make paid provider calls.
+    monkeypatch.setenv("ALEM_LOAD_ENV", "0")
+    monkeypatch.setenv("OPENAI_API_KEY", "")
+    monkeypatch.delenv("OPENAI_RATING_MODEL", raising=False)
+
+
 @pytest.fixture
 def app_db_path(tmp_path, monkeypatch):
     db_path = tmp_path / "test-hackalem.sqlite3"
