@@ -42,3 +42,6 @@ coverage/
 .DS_Store
 .idea/
 .sites-runtime/
+
+# Original local screen recording; the supplied summary.mp4 is tracked
+/summary.mov
