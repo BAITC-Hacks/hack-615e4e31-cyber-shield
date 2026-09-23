@@ -1,0 +1,1 @@
+"""HackAlem stage-one application."""

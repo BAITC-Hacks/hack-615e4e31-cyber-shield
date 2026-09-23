@@ -1,0 +1,1498 @@
+{
+  "metadata": {
+    "dataset_name": "HackAlem AI — синтетические данные для пункта 6",
+    "schema_version": "1.0.0",
+    "created_at": "2026-09-23",
+    "language": "ru",
+    "synthetic": true,
+    "source_document": "HackAlem AI_ кейс по геймификации практических заданий.docx",
+    "source_sections": [
+      3,
+      4,
+      5,
+      6,
+      11
+    ],
+    "notice": "Все организации, команды, контакты и бизнес-ситуации вымышлены. Совпадения случайны. Адреса .example и ссылки example.com — демонстрационные заглушки; готовые прототипы по ним не размещены.",
+    "counts": {
+      "drafts": 5,
+      "task_cards": 5,
+      "teams": 5,
+      "proposals": 5
+    },
+    "scope": "Начальные данные для MVP. Описания CSV в карточках — синтетические сведения о доступных бизнес-материалах; сами операционные CSV не включены.",
+    "state": "Все пять карточек опубликованы и подтверждены вручную в исходном демосостоянии. Все отклики ожидают решения бизнеса. Команды не выбраны."
+  },
+  "scoring_policy": {
+    "version": "1.0",
+    "criteria": [
+      {
+        "key": "context_and_need",
+        "label": "Контекст и потребность",
+        "weight": 20,
+        "components": [
+          {
+            "field": "context",
+            "weight": 10
+          },
+          {
+            "field": "need",
+            "weight": 10
+          }
+        ]
+      },
+      {
+        "key": "data_and_materials",
+        "label": "Данные и материалы",
+        "weight": 20,
+        "components": [
+          {
+            "field": "data",
+            "weight": 20
+          }
+        ]
+      },
+      {
+        "key": "expected_result",
+        "label": "Ожидаемый результат",
+        "weight": 15,
+        "components": [
+          {
+            "field": "expected_result",
+            "weight": 15
+          }
+        ]
+      },
+      {
+        "key": "success_criteria",
+        "label": "Критерии успеха",
+        "weight": 15,
+        "components": [
+          {
+            "field": "success_criteria",
+            "weight": 15
+          }
+        ]
+      },
+      {
+        "key": "constraints",
+        "label": "Ограничения",
+        "weight": 10,
+        "components": [
+          {
+            "field": "constraints",
+            "weight": 10
+          }
+        ]
+      },
+      {
+        "key": "users",
+        "label": "Пользователи",
+        "weight": 10,
+        "components": [
+          {
+            "field": "users",
+            "weight": 10
+          }
+        ]
+      },
+      {
+        "key": "business_communication",
+        "label": "Связь с бизнесом",
+        "weight": 10,
+        "components": [
+          {
+            "field": "contact",
+            "weight": 5
+          },
+          {
+            "field": "interaction_format",
+            "weight": 5
+          }
+        ]
+      }
+    ],
+    "rule": "За компонент начисляется его полный вес, только если поле содержит непустую строку и включено в confirmed_fields; иначе 0. Итог — сумма компонентов. При редактировании поля его подтверждение снимается до ручного подтверждения бизнеса.",
+    "implementation_choice": "Документ рекомендует веса семи критериев. Деление контекста и потребности на 10+10, связи с бизнесом на 5+5 и правило полного веса за подтверждённое непустое поле — выбранная для этого MVP реализация, а не дословное требование документа.",
+    "limitation": "Такая формула проверяет заполнение и подтверждение. Она сама по себе не доказывает содержательность или истинность введённого текста.",
+    "levels": [
+      {
+        "code": "draft",
+        "label": "Черновик",
+        "min": 0,
+        "max": 39
+      },
+      {
+        "code": "working",
+        "label": "Рабочая",
+        "min": 40,
+        "max": 69
+      },
+      {
+        "code": "ready",
+        "label": "Готовая",
+        "min": 70,
+        "max": 89
+      },
+      {
+        "code": "priority",
+        "label": "Приоритетная",
+        "min": 90,
+        "max": 100
+      }
+    ]
+  },
+  "catalog_policy": {
+    "visibility": "Все опубликованные карточки доступны всем командам независимо от рейтинга.",
+    "sort": [
+      {
+        "field": "rating.total",
+        "direction": "desc"
+      },
+      {
+        "field": "id",
+        "direction": "asc"
+      }
+    ],
+    "tie_breaker_is_demo_choice": true,
+    "filters": [
+      "topic",
+      "rating.level"
+    ],
+    "minimum_score_for_proposal": 0,
+    "minimum_score_for_recommendation": 40,
+    "proposal_limit": null,
+    "team_assignment": "manual_by_business",
+    "selection_cardinality": "zero_one_or_many",
+    "readiness_independent_of_publication": true
+  },
+  "drafts": [
+    {
+      "id": "draft_001",
+      "industry": "Общественное питание",
+      "text": "У нас небольшая пекарня в Караганде. Предзаказы приходят в мессенджер и записываются в тетрадь. Иногда заказ теряется или его готовят дважды. Хотим собрать предзаказы в одном месте и видеть их статусы.",
+      "completeness": "draft",
+      "card_id": "task_001"
+    },
+    {
+      "id": "draft_002",
+      "industry": "Автосервис",
+      "text": "Автосервис «Мотор Плюс» в Темиртау записывает клиентов по телефону в бумажный журнал. Иногда два клиента записаны к одному мастеру на одно время. Нужна единая запись с проверкой пересечений. Пользователи — администратор и мастера. Ожидаем веб-прототип: создать запись с мастером и временем, посмотреть расписание, изменить или отменить запись. Контакт администратора: reception@motor-plus.example.",
+      "completeness": "working",
+      "card_id": "task_002"
+    },
+    {
+      "id": "draft_003",
+      "industry": "Образование",
+      "text": "В учебном центре «Білім Старт» в Караганде преподаватели ведут посещаемость в отдельных таблицах, а администратор вручную собирает недельный отчёт. Нужен общий журнал с отчётом по группам. Пользователи — преподаватели и администратор. Можем дать синтетический CSV: 3 группы, 45 учебных идентификаторов студентов, 120 записей посещения; поля student_id, group_id, lesson_date, attendance_status. Ожидаем веб-прототип для импорта CSV, отметки посещения и выгрузки недельного отчёта. Контакт: coordinator@bilim-start.example. Координатор готов к двум онлайн-встречам по 20 минут в неделю и ответам по почте в течение рабочего дня.",
+      "completeness": "ready",
+      "card_id": "task_003"
+    },
+    {
+      "id": "draft_004",
+      "industry": "Розничная торговля",
+      "text": "В магазине «Сарыарқа Маркет» в Караганде закупщик вручную сверяет остатки с таблицей, и часть товаров заканчивается до следующей закупки. Нужен список товаров ниже заданного минимального остатка. Пользователи — закупщик и управляющий. Предоставим синтетический CSV из 60 товаров с полями sku, name, category, stock_qty, min_qty и 10 контрольных примеров. Ожидаем веб-прототип: импорт CSV, поиск, фильтр по категории и выгрузка списка закупок. Приёмка: все 60 корректных строк загружаются; в 10 контрольных примерах дефицит определён верно; выгрузка содержит sku, stock_qty, min_qty и shortage_qty, где shortage_qty = max(0, min_qty - stock_qty). Контакт: stock@saryarqa-market.example. Управляющий доступен онлайн по 15 минут в понедельник и четверг, обратная связь по почте — в течение одного рабочего дня.",
+      "completeness": "priority",
+      "card_id": "task_004"
+    },
+    {
+      "id": "draft_005",
+      "industry": "Логистика",
+      "text": "Служба «Дала Экспресс» в Караганде получает статусы доставок от курьеров в разных чатах; диспетчер вручную собирает их в таблицу. Нужен единый список отправлений с выделением просроченных. Пользователи: диспетчер обновляет статусы, руководитель смотрит сводку. Дадим синтетический CSV из 80 отправлений: shipment_id, courier_code, district, planned_at, status, updated_at, и 12 контрольных случаев; время в ISO 8601 с часовым поясом. Ожидаем веб-прототип с импортом, фильтрами по району и статусу, ручной сменой статуса и счётчиками. Статусы: new, in_transit, delivered, cancelled. Просрочка — planned_at раньше контрольного времени и статус не delivered и не cancelled. Условия приёмки: загружены 80 из 80 корректных строк; верны 12 из 12 контрольных случаев; фильтры соответствуют исходным данным; смена статуса сохраняется после перезагрузки. Контрольное время: 2026-09-23T10:00:00+05:00. Срок пилота — 10 календарных дней после выбора команды; без платных сервисов, GPS и подключения к рабочим системам, только синтетические данные. Контакт: dispatcher@dala-express.example. Диспетчер доступен для онлайн-встреч во вторник и пятницу по 20 минут; руководитель подтверждает этапы по почте в течение одного рабочего дня.",
+      "completeness": "priority",
+      "card_id": "task_005"
+    }
+  ],
+  "task_cards": [
+    {
+      "id": "task_001",
+      "source_draft_id": "draft_001",
+      "title": "Единый список предзаказов для пекарни",
+      "business_name": "Пекарня «Тёплый батон»",
+      "city": "Караганда",
+      "industry": "Общественное питание",
+      "topic": "Учёт заказов",
+      "context": "Предзаказы поступают в мессенджер и переносятся в тетрадь; бывают потери и дублирование заказов.",
+      "need": "Собрать предзаказы в одном месте и отслеживать их статусы.",
+      "data": null,
+      "expected_result": null,
+      "success_criteria": null,
+      "constraints": null,
+      "users": null,
+      "contact": null,
+      "interaction_format": null,
+      "publication_status": "published",
+      "confirmed_by_business": true,
+      "confirmed_fields": [
+        "title",
+        "context",
+        "need"
+      ],
+      "rating": {
+        "total": 20,
+        "max": 100,
+        "level": "draft",
+        "level_label": "Черновик",
+        "breakdown": [
+          {
+            "criterion": "context_and_need",
+            "label": "Контекст и потребность",
+            "max_points": 20,
+            "points": 20,
+            "components": [
+              {
+                "field": "context",
+                "max_points": 10,
+                "has_value": true,
+                "confirmed": true,
+                "points": 10
+              },
+              {
+                "field": "need",
+                "max_points": 10,
+                "has_value": true,
+                "confirmed": true,
+                "points": 10
+              }
+            ]
+          },
+          {
+            "criterion": "data_and_materials",
+            "label": "Данные и материалы",
+            "max_points": 20,
+            "points": 0,
+            "components": [
+              {
+                "field": "data",
+                "max_points": 20,
+                "has_value": false,
+                "confirmed": false,
+                "points": 0
+              }
+            ]
+          },
+          {
+            "criterion": "expected_result",
+            "label": "Ожидаемый результат",
+            "max_points": 15,
+            "points": 0,
+            "components": [
+              {
+                "field": "expected_result",
+                "max_points": 15,
+                "has_value": false,
+                "confirmed": false,
+                "points": 0
+              }
+            ]
+          },
+          {
+            "criterion": "success_criteria",
+            "label": "Критерии успеха",
+            "max_points": 15,
+            "points": 0,
+            "components": [
+              {
+                "field": "success_criteria",
+                "max_points": 15,
+                "has_value": false,
+                "confirmed": false,
+                "points": 0
+              }
+            ]
+          },
+          {
+            "criterion": "constraints",
+            "label": "Ограничения",
+            "max_points": 10,
+            "points": 0,
+            "components": [
+              {
+                "field": "constraints",
+                "max_points": 10,
+                "has_value": false,
+                "confirmed": false,
+                "points": 0
+              }
+            ]
+          },
+          {
+            "criterion": "users",
+            "label": "Пользователи",
+            "max_points": 10,
+            "points": 0,
+            "components": [
+              {
+                "field": "users",
+                "max_points": 10,
+                "has_value": false,
+                "confirmed": false,
+                "points": 0
+              }
+            ]
+          },
+          {
+            "criterion": "business_communication",
+            "label": "Связь с бизнесом",
+            "max_points": 10,
+            "points": 0,
+            "components": [
+              {
+                "field": "contact",
+                "max_points": 5,
+                "has_value": false,
+                "confirmed": false,
+                "points": 0
+              },
+              {
+                "field": "interaction_format",
+                "max_points": 5,
+                "has_value": false,
+                "confirmed": false,
+                "points": 0
+              }
+            ]
+          }
+        ],
+        "missing_fields": [
+          "data",
+          "expected_result",
+          "success_criteria",
+          "constraints",
+          "users",
+          "contact",
+          "interaction_format"
+        ],
+        "unconfirmed_fields": [],
+        "improvements": [
+          {
+            "field": "data",
+            "label": "Данные и материалы",
+            "reason": "missing",
+            "question": "Какие данные, примеры или материалы вы можете предоставить команде?",
+            "potential_points": 20
+          },
+          {
+            "field": "expected_result",
+            "label": "Ожидаемый результат",
+            "reason": "missing",
+            "question": "Какой конкретный результат должна передать команда?",
+            "potential_points": 15
+          },
+          {
+            "field": "success_criteria",
+            "label": "Критерии успеха",
+            "reason": "missing",
+            "question": "По каким измеримым условиям вы примете результат?",
+            "potential_points": 15
+          },
+          {
+            "field": "constraints",
+            "label": "Ограничения",
+            "reason": "missing",
+            "question": "Какие есть сроки, ограничения по технологиям, бюджету и доступам?",
+            "potential_points": 10
+          },
+          {
+            "field": "users",
+            "label": "Пользователи",
+            "reason": "missing",
+            "question": "Кто будет пользоваться решением и какие действия выполнять?",
+            "potential_points": 10
+          },
+          {
+            "field": "contact",
+            "label": "Контакт",
+            "reason": "missing",
+            "question": "С кем команда сможет связаться по задаче?",
+            "potential_points": 5
+          },
+          {
+            "field": "interaction_format",
+            "label": "Формат взаимодействия",
+            "reason": "missing",
+            "question": "Как часто и в каком формате вы сможете давать обратную связь?",
+            "potential_points": 5
+          }
+        ]
+      },
+      "can_receive_proposals": true,
+      "recommendation_eligible": false,
+      "selected_team_ids": []
+    },
+    {
+      "id": "task_002",
+      "source_draft_id": "draft_002",
+      "title": "Расписание записи в автосервис",
+      "business_name": "Автосервис «Мотор Плюс»",
+      "city": "Темиртау",
+      "industry": "Автосервис",
+      "topic": "Запись клиентов",
+      "context": "Администратор ведёт телефонную запись в бумажном журнале; встречаются пересечения записей к одному мастеру.",
+      "need": "Вести единое расписание и проверять пересечения записей.",
+      "data": null,
+      "expected_result": "Веб-прототип с созданием, просмотром, изменением и отменой записей; запись содержит мастера и время.",
+      "success_criteria": null,
+      "constraints": null,
+      "users": "Администратор создаёт и изменяет записи; мастера просматривают своё расписание.",
+      "contact": "Администратор автосервиса, reception@motor-plus.example.",
+      "interaction_format": null,
+      "publication_status": "published",
+      "confirmed_by_business": true,
+      "confirmed_fields": [
+        "title",
+        "context",
+        "need",
+        "expected_result",
+        "users",
+        "contact"
+      ],
+      "rating": {
+        "total": 50,
+        "max": 100,
+        "level": "working",
+        "level_label": "Рабочая",
+        "breakdown": [
+          {
+            "criterion": "context_and_need",
+            "label": "Контекст и потребность",
+            "max_points": 20,
+            "points": 20,
+            "components": [
+              {
+                "field": "context",
+                "max_points": 10,
+                "has_value": true,
+                "confirmed": true,
+                "points": 10
+              },
+              {
+                "field": "need",
+                "max_points": 10,
+                "has_value": true,
+                "confirmed": true,
+                "points": 10
+              }
+            ]
+          },
+          {
+            "criterion": "data_and_materials",
+            "label": "Данные и материалы",
+            "max_points": 20,
+            "points": 0,
+            "components": [
+              {
+                "field": "data",
+                "max_points": 20,
+                "has_value": false,
+                "confirmed": false,
+                "points": 0
+              }
+            ]
+          },
+          {
+            "criterion": "expected_result",
+            "label": "Ожидаемый результат",
+            "max_points": 15,
+            "points": 15,
+            "components": [
+              {
+                "field": "expected_result",
+                "max_points": 15,
+                "has_value": true,
+                "confirmed": true,
+                "points": 15
+              }
+            ]
+          },
+          {
+            "criterion": "success_criteria",
+            "label": "Критерии успеха",
+            "max_points": 15,
+            "points": 0,
+            "components": [
+              {
+                "field": "success_criteria",
+                "max_points": 15,
+                "has_value": false,
+                "confirmed": false,
+                "points": 0
+              }
+            ]
+          },
+          {
+            "criterion": "constraints",
+            "label": "Ограничения",
+            "max_points": 10,
+            "points": 0,
+            "components": [
+              {
+                "field": "constraints",
+                "max_points": 10,
+                "has_value": false,
+                "confirmed": false,
+                "points": 0
+              }
+            ]
+          },
+          {
+            "criterion": "users",
+            "label": "Пользователи",
+            "max_points": 10,
+            "points": 10,
+            "components": [
+              {
+                "field": "users",
+                "max_points": 10,
+                "has_value": true,
+                "confirmed": true,
+                "points": 10
+              }
+            ]
+          },
+          {
+            "criterion": "business_communication",
+            "label": "Связь с бизнесом",
+            "max_points": 10,
+            "points": 5,
+            "components": [
+              {
+                "field": "contact",
+                "max_points": 5,
+                "has_value": true,
+                "confirmed": true,
+                "points": 5
+              },
+              {
+                "field": "interaction_format",
+                "max_points": 5,
+                "has_value": false,
+                "confirmed": false,
+                "points": 0
+              }
+            ]
+          }
+        ],
+        "missing_fields": [
+          "data",
+          "success_criteria",
+          "constraints",
+          "interaction_format"
+        ],
+        "unconfirmed_fields": [],
+        "improvements": [
+          {
+            "field": "data",
+            "label": "Данные и материалы",
+            "reason": "missing",
+            "question": "Какие данные, примеры или материалы вы можете предоставить команде?",
+            "potential_points": 20
+          },
+          {
+            "field": "success_criteria",
+            "label": "Критерии успеха",
+            "reason": "missing",
+            "question": "По каким измеримым условиям вы примете результат?",
+            "potential_points": 15
+          },
+          {
+            "field": "constraints",
+            "label": "Ограничения",
+            "reason": "missing",
+            "question": "Какие есть сроки, ограничения по технологиям, бюджету и доступам?",
+            "potential_points": 10
+          },
+          {
+            "field": "interaction_format",
+            "label": "Формат взаимодействия",
+            "reason": "missing",
+            "question": "Как часто и в каком формате вы сможете давать обратную связь?",
+            "potential_points": 5
+          }
+        ]
+      },
+      "can_receive_proposals": true,
+      "recommendation_eligible": true,
+      "selected_team_ids": []
+    },
+    {
+      "id": "task_003",
+      "source_draft_id": "draft_003",
+      "title": "Журнал посещаемости и отчёт по учебным группам",
+      "business_name": "Учебный центр «Білім Старт»",
+      "city": "Караганда",
+      "industry": "Образование",
+      "topic": "Учёт посещаемости",
+      "context": "Преподаватели ведут отдельные таблицы посещаемости, администратор вручную сводит недельный отчёт.",
+      "need": "Объединить учёт посещаемости и формирование отчётов по группам.",
+      "data": "Синтетический CSV: 3 группы, 45 учебных идентификаторов студентов, 120 записей посещения; поля student_id, group_id, lesson_date, attendance_status. Это описание доступных бизнес-материалов; сам CSV не входит в данный демонабор.",
+      "expected_result": "Веб-прототип с импортом CSV, отметкой посещений и выгрузкой недельного отчёта по группам.",
+      "success_criteria": null,
+      "constraints": null,
+      "users": "Преподаватели отмечают посещения; администратор смотрит и выгружает сводный отчёт.",
+      "contact": "Координатор учебного центра, coordinator@bilim-start.example.",
+      "interaction_format": "Две онлайн-встречи по 20 минут в неделю; ответы по почте в течение рабочего дня.",
+      "publication_status": "published",
+      "confirmed_by_business": true,
+      "confirmed_fields": [
+        "title",
+        "context",
+        "need",
+        "data",
+        "expected_result",
+        "users",
+        "contact",
+        "interaction_format"
+      ],
+      "rating": {
+        "total": 75,
+        "max": 100,
+        "level": "ready",
+        "level_label": "Готовая",
+        "breakdown": [
+          {
+            "criterion": "context_and_need",
+            "label": "Контекст и потребность",
+            "max_points": 20,
+            "points": 20,
+            "components": [
+              {
+                "field": "context",
+                "max_points": 10,
+                "has_value": true,
+                "confirmed": true,
+                "points": 10
+              },
+              {
+                "field": "need",
+                "max_points": 10,
+                "has_value": true,
+                "confirmed": true,
+                "points": 10
+              }
+            ]
+          },
+          {
+            "criterion": "data_and_materials",
+            "label": "Данные и материалы",
+            "max_points": 20,
+            "points": 20,
+            "components": [
+              {
+                "field": "data",
+                "max_points": 20,
+                "has_value": true,
+                "confirmed": true,
+                "points": 20
+              }
+            ]
+          },
+          {
+            "criterion": "expected_result",
+            "label": "Ожидаемый результат",
+            "max_points": 15,
+            "points": 15,
+            "components": [
+              {
+                "field": "expected_result",
+                "max_points": 15,
+                "has_value": true,
+                "confirmed": true,
+                "points": 15
+              }
+            ]
+          },
+          {
+            "criterion": "success_criteria",
+            "label": "Критерии успеха",
+            "max_points": 15,
+            "points": 0,
+            "components": [
+              {
+                "field": "success_criteria",
+                "max_points": 15,
+                "has_value": false,
+                "confirmed": false,
+                "points": 0
+              }
+            ]
+          },
+          {
+            "criterion": "constraints",
+            "label": "Ограничения",
+            "max_points": 10,
+            "points": 0,
+            "components": [
+              {
+                "field": "constraints",
+                "max_points": 10,
+                "has_value": false,
+                "confirmed": false,
+                "points": 0
+              }
+            ]
+          },
+          {
+            "criterion": "users",
+            "label": "Пользователи",
+            "max_points": 10,
+            "points": 10,
+            "components": [
+              {
+                "field": "users",
+                "max_points": 10,
+                "has_value": true,
+                "confirmed": true,
+                "points": 10
+              }
+            ]
+          },
+          {
+            "criterion": "business_communication",
+            "label": "Связь с бизнесом",
+            "max_points": 10,
+            "points": 10,
+            "components": [
+              {
+                "field": "contact",
+                "max_points": 5,
+                "has_value": true,
+                "confirmed": true,
+                "points": 5
+              },
+              {
+                "field": "interaction_format",
+                "max_points": 5,
+                "has_value": true,
+                "confirmed": true,
+                "points": 5
+              }
+            ]
+          }
+        ],
+        "missing_fields": [
+          "success_criteria",
+          "constraints"
+        ],
+        "unconfirmed_fields": [],
+        "improvements": [
+          {
+            "field": "success_criteria",
+            "label": "Критерии успеха",
+            "reason": "missing",
+            "question": "По каким измеримым условиям вы примете результат?",
+            "potential_points": 15
+          },
+          {
+            "field": "constraints",
+            "label": "Ограничения",
+            "reason": "missing",
+            "question": "Какие есть сроки, ограничения по технологиям, бюджету и доступам?",
+            "potential_points": 10
+          }
+        ]
+      },
+      "can_receive_proposals": true,
+      "recommendation_eligible": true,
+      "selected_team_ids": []
+    },
+    {
+      "id": "task_004",
+      "source_draft_id": "draft_004",
+      "title": "Контроль минимальных остатков товара",
+      "business_name": "Магазин «Сарыарқа Маркет»",
+      "city": "Караганда",
+      "industry": "Розничная торговля",
+      "topic": "Складской учёт",
+      "context": "Закупщик вручную сверяет остатки с таблицей; некоторые товары заканчиваются до следующей закупки.",
+      "need": "Показывать товары, остаток которых ниже заданного минимума, и формировать список закупок.",
+      "data": "Синтетический CSV из 60 товаров: sku, name, category, stock_qty, min_qty; 10 контрольных примеров. Это описание доступных бизнес-материалов; сами материалы не входят в данный демонабор.",
+      "expected_result": "Веб-прототип с импортом CSV, поиском, фильтром по категории и выгрузкой списка закупок.",
+      "success_criteria": "Загружаются 60 из 60 корректных строк; правильно обработаны 10 из 10 контрольных примеров; выгрузка содержит sku, stock_qty, min_qty, shortage_qty; shortage_qty = max(0, min_qty - stock_qty).",
+      "constraints": null,
+      "users": "Закупщик готовит список закупок; управляющий просматривает остатки и дефицит.",
+      "contact": "Управляющий магазина, stock@saryarqa-market.example.",
+      "interaction_format": "Онлайн-встречи по 15 минут в понедельник и четверг; ответы по почте в течение одного рабочего дня.",
+      "publication_status": "published",
+      "confirmed_by_business": true,
+      "confirmed_fields": [
+        "title",
+        "context",
+        "need",
+        "data",
+        "expected_result",
+        "success_criteria",
+        "users",
+        "contact",
+        "interaction_format"
+      ],
+      "rating": {
+        "total": 90,
+        "max": 100,
+        "level": "priority",
+        "level_label": "Приоритетная",
+        "breakdown": [
+          {
+            "criterion": "context_and_need",
+            "label": "Контекст и потребность",
+            "max_points": 20,
+            "points": 20,
+            "components": [
+              {
+                "field": "context",
+                "max_points": 10,
+                "has_value": true,
+                "confirmed": true,
+                "points": 10
+              },
+              {
+                "field": "need",
+                "max_points": 10,
+                "has_value": true,
+                "confirmed": true,
+                "points": 10
+              }
+            ]
+          },
+          {
+            "criterion": "data_and_materials",
+            "label": "Данные и материалы",
+            "max_points": 20,
+            "points": 20,
+            "components": [
+              {
+                "field": "data",
+                "max_points": 20,
+                "has_value": true,
+                "confirmed": true,
+                "points": 20
+              }
+            ]
+          },
+          {
+            "criterion": "expected_result",
+            "label": "Ожидаемый результат",
+            "max_points": 15,
+            "points": 15,
+            "components": [
+              {
+                "field": "expected_result",
+                "max_points": 15,
+                "has_value": true,
+                "confirmed": true,
+                "points": 15
+              }
+            ]
+          },
+          {
+            "criterion": "success_criteria",
+            "label": "Критерии успеха",
+            "max_points": 15,
+            "points": 15,
+            "components": [
+              {
+                "field": "success_criteria",
+                "max_points": 15,
+                "has_value": true,
+                "confirmed": true,
+                "points": 15
+              }
+            ]
+          },
+          {
+            "criterion": "constraints",
+            "label": "Ограничения",
+            "max_points": 10,
+            "points": 0,
+            "components": [
+              {
+                "field": "constraints",
+                "max_points": 10,
+                "has_value": false,
+                "confirmed": false,
+                "points": 0
+              }
+            ]
+          },
+          {
+            "criterion": "users",
+            "label": "Пользователи",
+            "max_points": 10,
+            "points": 10,
+            "components": [
+              {
+                "field": "users",
+                "max_points": 10,
+                "has_value": true,
+                "confirmed": true,
+                "points": 10
+              }
+            ]
+          },
+          {
+            "criterion": "business_communication",
+            "label": "Связь с бизнесом",
+            "max_points": 10,
+            "points": 10,
+            "components": [
+              {
+                "field": "contact",
+                "max_points": 5,
+                "has_value": true,
+                "confirmed": true,
+                "points": 5
+              },
+              {
+                "field": "interaction_format",
+                "max_points": 5,
+                "has_value": true,
+                "confirmed": true,
+                "points": 5
+              }
+            ]
+          }
+        ],
+        "missing_fields": [
+          "constraints"
+        ],
+        "unconfirmed_fields": [],
+        "improvements": [
+          {
+            "field": "constraints",
+            "label": "Ограничения",
+            "reason": "missing",
+            "question": "Какие есть сроки, ограничения по технологиям, бюджету и доступам?",
+            "potential_points": 10
+          }
+        ]
+      },
+      "can_receive_proposals": true,
+      "recommendation_eligible": true,
+      "selected_team_ids": []
+    },
+    {
+      "id": "task_005",
+      "source_draft_id": "draft_005",
+      "title": "Панель контроля статусов доставки",
+      "business_name": "Доставка «Дала Экспресс»",
+      "city": "Караганда",
+      "industry": "Логистика",
+      "topic": "Контроль доставки",
+      "context": "Курьеры сообщают статусы в разных чатах; диспетчер вручную переносит их в общую таблицу.",
+      "need": "Объединить статусы отправлений и выделять просроченные доставки.",
+      "data": "Синтетический CSV из 80 отправлений: shipment_id, courier_code, district, planned_at, status, updated_at; 12 контрольных случаев. Время в ISO 8601 с часовым поясом. Это описание доступных бизнес-материалов; сами материалы не входят в данный демонабор.",
+      "expected_result": "Веб-прототип с импортом отправлений, фильтрами по району и статусу, ручной сменой статуса и сводными счётчиками.",
+      "success_criteria": "Импортируются 80 из 80 корректных строк; верны 12 из 12 контрольных случаев; фильтры соответствуют исходным данным; смена статуса сохраняется после перезагрузки. Статусы: new, in_transit, delivered, cancelled. Просрочка: planned_at < 2026-09-23T10:00:00+05:00 и статус не delivered и не cancelled.",
+      "constraints": "Пилот за 10 календарных дней после выбора команды. Без платных сервисов, GPS и интеграции с рабочими системами. Только синтетические данные.",
+      "users": "Диспетчер обновляет статусы; руководитель просматривает сводку.",
+      "contact": "Диспетчер службы доставки, dispatcher@dala-express.example.",
+      "interaction_format": "Онлайн-встречи во вторник и пятницу по 20 минут; руководитель подтверждает этапы по почте в течение одного рабочего дня.",
+      "publication_status": "published",
+      "confirmed_by_business": true,
+      "confirmed_fields": [
+        "title",
+        "context",
+        "need",
+        "data",
+        "expected_result",
+        "success_criteria",
+        "constraints",
+        "users",
+        "contact",
+        "interaction_format"
+      ],
+      "rating": {
+        "total": 100,
+        "max": 100,
+        "level": "priority",
+        "level_label": "Приоритетная",
+        "breakdown": [
+          {
+            "criterion": "context_and_need",
+            "label": "Контекст и потребность",
+            "max_points": 20,
+            "points": 20,
+            "components": [
+              {
+                "field": "context",
+                "max_points": 10,
+                "has_value": true,
+                "confirmed": true,
+                "points": 10
+              },
+              {
+                "field": "need",
+                "max_points": 10,
+                "has_value": true,
+                "confirmed": true,
+                "points": 10
+              }
+            ]
+          },
+          {
+            "criterion": "data_and_materials",
+            "label": "Данные и материалы",
+            "max_points": 20,
+            "points": 20,
+            "components": [
+              {
+                "field": "data",
+                "max_points": 20,
+                "has_value": true,
+                "confirmed": true,
+                "points": 20
+              }
+            ]
+          },
+          {
+            "criterion": "expected_result",
+            "label": "Ожидаемый результат",
+            "max_points": 15,
+            "points": 15,
+            "components": [
+              {
+                "field": "expected_result",
+                "max_points": 15,
+                "has_value": true,
+                "confirmed": true,
+                "points": 15
+              }
+            ]
+          },
+          {
+            "criterion": "success_criteria",
+            "label": "Критерии успеха",
+            "max_points": 15,
+            "points": 15,
+            "components": [
+              {
+                "field": "success_criteria",
+                "max_points": 15,
+                "has_value": true,
+                "confirmed": true,
+                "points": 15
+              }
+            ]
+          },
+          {
+            "criterion": "constraints",
+            "label": "Ограничения",
+            "max_points": 10,
+            "points": 10,
+            "components": [
+              {
+                "field": "constraints",
+                "max_points": 10,
+                "has_value": true,
+                "confirmed": true,
+                "points": 10
+              }
+            ]
+          },
+          {
+            "criterion": "users",
+            "label": "Пользователи",
+            "max_points": 10,
+            "points": 10,
+            "components": [
+              {
+                "field": "users",
+                "max_points": 10,
+                "has_value": true,
+                "confirmed": true,
+                "points": 10
+              }
+            ]
+          },
+          {
+            "criterion": "business_communication",
+            "label": "Связь с бизнесом",
+            "max_points": 10,
+            "points": 10,
+            "components": [
+              {
+                "field": "contact",
+                "max_points": 5,
+                "has_value": true,
+                "confirmed": true,
+                "points": 5
+              },
+              {
+                "field": "interaction_format",
+                "max_points": 5,
+                "has_value": true,
+                "confirmed": true,
+                "points": 5
+              }
+            ]
+          }
+        ],
+        "missing_fields": [],
+        "unconfirmed_fields": [],
+        "improvements": []
+      },
+      "can_receive_proposals": true,
+      "recommendation_eligible": true,
+      "selected_team_ids": []
+    }
+  ],
+  "teams": [
+    {
+      "id": "team_001",
+      "name": "Qadam Web",
+      "member_count": 3,
+      "interests": [
+        "Малый бизнес",
+        "Общественное питание",
+        "Учёт заказов"
+      ],
+      "skills": [
+        "Веб-разработка",
+        "Проектирование баз данных",
+        "Тестирование форм"
+      ],
+      "technologies": [
+        "Python",
+        "Django",
+        "SQLite",
+        "HTML",
+        "CSS"
+      ]
+    },
+    {
+      "id": "team_002",
+      "name": "Bilim Builders",
+      "member_count": 4,
+      "interests": [
+        "Образование",
+        "Отчёты",
+        "Автоматизация учёта"
+      ],
+      "skills": [
+        "Разработка API",
+        "Обработка CSV",
+        "Проектирование интерфейсов"
+      ],
+      "technologies": [
+        "Python",
+        "FastAPI",
+        "React",
+        "TypeScript",
+        "SQLite"
+      ]
+    },
+    {
+      "id": "team_003",
+      "name": "Stock Lab",
+      "member_count": 3,
+      "interests": [
+        "Розничная торговля",
+        "Складской учёт",
+        "Аналитика"
+      ],
+      "skills": [
+        "Обработка табличных данных",
+        "Валидация импорта",
+        "Визуализация показателей"
+      ],
+      "technologies": [
+        "Python",
+        "pandas",
+        "Streamlit",
+        "SQLite"
+      ]
+    },
+    {
+      "id": "team_004",
+      "name": "Route Makers",
+      "member_count": 5,
+      "interests": [
+        "Логистика",
+        "Контроль доставки",
+        "Операционные панели"
+      ],
+      "skills": [
+        "Разработка API",
+        "Фильтрация данных",
+        "Хранение истории статусов",
+        "Тестирование"
+      ],
+      "technologies": [
+        "Python",
+        "FastAPI",
+        "React",
+        "PostgreSQL"
+      ]
+    },
+    {
+      "id": "team_005",
+      "name": "Simple Flow",
+      "member_count": 4,
+      "interests": [
+        "Логистика",
+        "Малый бизнес",
+        "Автоматизация процессов"
+      ],
+      "skills": [
+        "Веб-разработка",
+        "UX-прототипирование",
+        "Импорт и экспорт CSV"
+      ],
+      "technologies": [
+        "Python",
+        "Django",
+        "HTMX",
+        "SQLite"
+      ]
+    }
+  ],
+  "proposals": [
+    {
+      "id": "proposal_001",
+      "task_id": "task_001",
+      "team_id": "team_001",
+      "idea": "Сделать веб-журнал предзаказов со статусами; окончательный состав полей согласовать с пекарней.",
+      "plan": [
+        {
+          "step": 1,
+          "description": "Уточнить пользователей, поля заказа, сроки и критерии приёмки."
+        },
+        {
+          "step": 2,
+          "description": "Собрать форму заказа и общий список со сменой статуса."
+        },
+        {
+          "step": 3,
+          "description": "Провести демонстрацию на синтетических заказах и внести согласованные правки."
+        }
+      ],
+      "duration_days": 7,
+      "duration_unit": "calendar_days",
+      "duration_starts": "after_manual_team_selection",
+      "prototype_url": "https://example.com/hackalem/prototypes/proposal-001",
+      "prototype_url_is_placeholder": true,
+      "assumptions": [
+        "Срок 7 дней предварительный: ограничения бизнеса ещё не указаны.",
+        "Состав полей и статусов — предложение команды, требует подтверждения бизнеса."
+      ],
+      "status": "submitted",
+      "business_decision": null,
+      "submitted_at": "2026-09-23T09:01:00Z"
+    },
+    {
+      "id": "proposal_002",
+      "task_id": "task_003",
+      "team_id": "team_002",
+      "idea": "Объединить посещаемость в журнале с импортом CSV и недельной выгрузкой по группам.",
+      "plan": [
+        {
+          "step": 1,
+          "description": "Согласовать формат CSV, сроки и измеримые критерии приёмки."
+        },
+        {
+          "step": 2,
+          "description": "Реализовать импорт, журнал посещений и недельную выгрузку."
+        },
+        {
+          "step": 3,
+          "description": "Проверить журнал на согласованных примерах и показать координатору."
+        }
+      ],
+      "duration_days": 10,
+      "duration_unit": "calendar_days",
+      "duration_starts": "after_manual_team_selection",
+      "prototype_url": "https://example.com/hackalem/prototypes/proposal-002",
+      "prototype_url_is_placeholder": true,
+      "assumptions": [
+        "Срок предложен командой; бизнес ещё не подтвердил ограничения и критерии успеха."
+      ],
+      "status": "submitted",
+      "business_decision": null,
+      "submitted_at": "2026-09-23T09:02:00Z"
+    },
+    {
+      "id": "proposal_003",
+      "task_id": "task_004",
+      "team_id": "team_003",
+      "idea": "Собрать панель остатков и формировать список закупок по заданному минимальному количеству.",
+      "plan": [
+        {
+          "step": 1,
+          "description": "Уточнить ограничения и проверить структуру тестового CSV."
+        },
+        {
+          "step": 2,
+          "description": "Реализовать импорт, поиск, фильтры и расчёт shortage_qty."
+        },
+        {
+          "step": 3,
+          "description": "Проверить 60 строк и 10 контрольных примеров; показать выгрузку закупок."
+        }
+      ],
+      "duration_days": 7,
+      "duration_unit": "calendar_days",
+      "duration_starts": "after_manual_team_selection",
+      "prototype_url": "https://example.com/hackalem/prototypes/proposal-003",
+      "prototype_url_is_placeholder": true,
+      "assumptions": [
+        "Срок и стек предложены командой; ограничения бизнеса ещё не подтверждены."
+      ],
+      "status": "submitted",
+      "business_decision": null,
+      "submitted_at": "2026-09-23T09:03:00Z"
+    },
+    {
+      "id": "proposal_004",
+      "task_id": "task_005",
+      "team_id": "team_004",
+      "idea": "Сделать панель отправлений с фильтрами, ручной сменой статуса и сохранением изменений в базе.",
+      "plan": [
+        {
+          "step": 1,
+          "description": "Проверить CSV, правила статусов и определение просрочки."
+        },
+        {
+          "step": 2,
+          "description": "Реализовать API, импорт, базу данных и интерфейс диспетчера."
+        },
+        {
+          "step": 3,
+          "description": "Проверить 80 строк, 12 контрольных случаев и сохранение статуса после перезагрузки."
+        }
+      ],
+      "duration_days": 10,
+      "duration_unit": "calendar_days",
+      "duration_starts": "after_manual_team_selection",
+      "prototype_url": "https://example.com/hackalem/prototypes/proposal-004",
+      "prototype_url_is_placeholder": true,
+      "assumptions": [
+        "Работа только с синтетическими данными; GPS и рабочие интеграции не используются."
+      ],
+      "status": "submitted",
+      "business_decision": null,
+      "submitted_at": "2026-09-23T09:04:00Z"
+    },
+    {
+      "id": "proposal_005",
+      "task_id": "task_005",
+      "team_id": "team_005",
+      "idea": "Собрать компактное приложение Django с таблицей отправлений, фильтрами и сводными счётчиками.",
+      "plan": [
+        {
+          "step": 1,
+          "description": "Согласовать экран диспетчера и проверить тестовый CSV."
+        },
+        {
+          "step": 2,
+          "description": "Реализовать импорт, фильтры, ручную смену статуса и хранение в SQLite."
+        },
+        {
+          "step": 3,
+          "description": "Проверить все условия приёмки и подготовить инструкцию запуска."
+        }
+      ],
+      "duration_days": 8,
+      "duration_unit": "calendar_days",
+      "duration_starts": "after_manual_team_selection",
+      "prototype_url": "https://example.com/hackalem/prototypes/proposal-005",
+      "prototype_url_is_placeholder": true,
+      "assumptions": [
+        "Восемь дней укладываются в ограничение 10 дней.",
+        "Прототип работает на синтетических данных, без платных сервисов и GPS."
+      ],
+      "status": "submitted",
+      "business_decision": null,
+      "submitted_at": "2026-09-23T09:05:00Z"
+    }
+  ],
+  "demo_scenario": {
+    "title": "Дополнение слабого черновика и ручной выбор команды",
+    "task_id": "task_001",
+    "draft_id": "draft_001",
+    "note": "Ответы ниже — отдельные синтетические ответы представителя бизнеса. Они не являются исходными сведениями draft_001 и не должны автоматически подставляться или генерироваться как факты.",
+    "initial_rating": 20,
+    "clarification_steps": [
+      {
+        "field": "data",
+        "question": "Какие данные, примеры или материалы вы можете предоставить команде?",
+        "synthetic_business_answer": "Можем предоставить 30 синтетических предзаказов в CSV: order_id, customer_code, product, quantity, pickup_at, status. Рабочие данные клиентов использовать не будем.",
+        "expected_score_before": 20,
+        "expected_score_before_confirmation": 20,
+        "expected_score_after_confirmation": 40,
+        "expected_level_after_confirmation": "working"
+      },
+      {
+        "field": "expected_result",
+        "question": "Какой конкретный результат должна передать команда?",
+        "synthetic_business_answer": "Веб-прототип с созданием предзаказа, общим списком и сменой статуса между new, preparing, ready и completed.",
+        "expected_score_before": 40,
+        "expected_score_before_confirmation": 40,
+        "expected_score_after_confirmation": 55,
+        "expected_level_after_confirmation": "working"
+      },
+      {
+        "field": "success_criteria",
+        "question": "По каким измеримым условиям вы примете результат?",
+        "synthetic_business_answer": "Импортируются 30 из 30 корректных строк; повторный order_id отклоняется; все 8 контрольных смен статуса сохраняются после перезагрузки.",
+        "expected_score_before": 55,
+        "expected_score_before_confirmation": 55,
+        "expected_score_after_confirmation": 70,
+        "expected_level_after_confirmation": "ready"
+      },
+      {
+        "field": "constraints",
+        "question": "Какие есть сроки, ограничения по технологиям, бюджету и доступам?",
+        "synthetic_business_answer": "Пилот за 7 календарных дней после выбора команды. Только синтетические данные, без платных сервисов и подключения к мессенджерам.",
+        "expected_score_before": 70,
+        "expected_score_before_confirmation": 70,
+        "expected_score_after_confirmation": 80,
+        "expected_level_after_confirmation": "ready"
+      },
+      {
+        "field": "users",
+        "question": "Кто будет пользоваться решением и какие действия выполнять?",
+        "synthetic_business_answer": "Продавец создаёт предзаказы; пекарь просматривает список и меняет статус; владелец проверяет общий список.",
+        "expected_score_before": 80,
+        "expected_score_before_confirmation": 80,
+        "expected_score_after_confirmation": 90,
+        "expected_level_after_confirmation": "priority"
+      },
+      {
+        "field": "contact",
+        "question": "С кем команда сможет связаться по задаче?",
+        "synthetic_business_answer": "Владелец пекарни, owner@teply-baton.example.",
+        "expected_score_before": 90,
+        "expected_score_before_confirmation": 90,
+        "expected_score_after_confirmation": 95,
+        "expected_level_after_confirmation": "priority"
+      },
+      {
+        "field": "interaction_format",
+        "question": "Как часто и в каком формате вы сможете давать обратную связь?",
+        "synthetic_business_answer": "Одна онлайн-встреча на 20 минут в день; подтверждение этапов и обратная связь по почте в течение рабочего дня.",
+        "expected_score_before": 95,
+        "expected_score_before_confirmation": 95,
+        "expected_score_after_confirmation": 100,
+        "expected_level_after_confirmation": "priority"
+      }
+    ],
+    "final_rating": 100,
+    "complete_flow": [
+      "В отдельной демонстрационной сессии открыть draft_001 и показать исходный текст.",
+      "Показать минимум три уместных вопроса; для полного заполнения использовать семь вопросов и ответов clarification_steps.",
+      "Сформировать редактируемую карточку. После каждого ответа показать, что баллы добавляются только при подтверждении бизнеса.",
+      "После ручного подтверждения опубликовать карточку и показать её позицию в каталоге.",
+      "От имени team_001 вручную отправить отклик по содержимому proposal_001.",
+      "От имени бизнеса вручную принять либо отклонить отклик; при принятии добавить team_001 в selected_team_ids."
+    ],
+    "reset_note": "Исходный JSON уже содержит опубликованные карточки и отправленные отклики. Для показа полного пути создать отдельную сессию без опубликованной task_001 и proposal_001; не создавать дубли с теми же ID.",
+    "comparison_demo": {
+      "task_id": "task_005",
+      "proposal_ids": [
+        "proposal_004",
+        "proposal_005"
+      ],
+      "action": "Сравнить идеи, планы и сроки, затем вручную выбрать одну, обе или ни одной команды."
+    }
+  }
+}
