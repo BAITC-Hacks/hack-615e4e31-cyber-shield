@@ -1,8 +1,7 @@
 """Pure readiness rules; no AI, persistence or team assignment."""
 
-import re
-
 from .models import Rating, RatingItem, Readiness, TaskFields
+from .quality import assess_quality, has_content
 
 FIELD_LABELS = {
     "context": "Контекст",
@@ -27,18 +26,6 @@ RATING_GROUPS = (
     ("businessContact", "Связь с бизнесом", (("contact", 5), ("interactionFormat", 5))),
 )
 
-PLACEHOLDERS = {"уточнить", "неизвестно", "tbd", "todo", "n/a", "пока неизвестно", "будет уточнено"}
-
-
-def has_content(value: str) -> bool:
-    """Reject empty/punctuation-only text and explicit whole-field placeholders.
-
-    This assesses completion, not the factual truth or quality of a claim.
-    """
-    normalized = " ".join(value.casefold().split()).strip(" .…!?;:—–-_\"'«»()[]")
-    return bool(re.search(r"\w", normalized, flags=re.UNICODE)) and normalized not in PLACEHOLDERS
-
-
 def readiness(score: int) -> Readiness:
     if score < 40:
         return "draft"
@@ -51,18 +38,21 @@ def readiness(score: int) -> Readiness:
 
 def calculate_rating(fields: TaskFields, *, confirmed: bool = True, confirmed_fields: list[str] | None = None) -> Rating:
     """Preview defaults to confirmed=True; draft callers explicitly pass False."""
+    quality = assess_quality(fields)
+    eligible = set(quality.eligibleFields)
+    field_quality = {item.field: item for item in quality.fields}
     breakdown: list[RatingItem] = []
     missing_fields: list[str] = []
     for key, label, members in RATING_GROUPS:
         missing = [name for name, _ in members if not has_content(getattr(fields, name))]
         missing_fields.extend(missing)
-        earned = sum(weight for name, weight in members if has_content(getattr(fields, name)) and (confirmed_fields is None or name in confirmed_fields)) if confirmed else 0
+        earned = sum(weight for name, weight in members if name in eligible and (confirmed_fields is None or name in confirmed_fields)) if confirmed else 0
         breakdown.append(RatingItem(
             key=key,
             label=label,
             earned=earned,
             max=sum(weight for _, weight in members),
-            missing=[f"Добавьте: {FIELD_LABELS[name].lower()}" for name in missing],
+            missing=[field_quality[name].suggestion for name, _ in members if name not in eligible],
         ))
     score = sum(item.earned for item in breakdown)
-    return Rating(score=score, level=readiness(score), breakdown=breakdown, missingFields=missing_fields)
+    return Rating(score=score, level=readiness(score), breakdown=breakdown, missingFields=missing_fields, quality=quality)

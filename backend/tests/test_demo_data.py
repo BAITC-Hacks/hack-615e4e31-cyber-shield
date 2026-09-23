@@ -30,8 +30,8 @@ def test_demo_data_preserves_source_records_and_referential_integrity(client, ap
     response = checked(client.get("/api/demo-data"))
     api_ids = response.pop("apiIds")
     assert response == source
-    assert set(api_ids) == {record["id"] for section in ("drafts", "task_cards") for record in source[section]}
-    assert len(set(api_ids.values())) == 10
+    assert set(api_ids) == {record["id"] for section in ("drafts", "task_cards", "teams", "proposals") for record in source[section]}
+    assert len(set(api_ids.values())) == 20
     assert all(UUID(value).version == 5 for value in api_ids.values())
     for section in ("drafts", "task_cards", "teams", "proposals"):
         assert len(source[section]) == 5
@@ -147,7 +147,8 @@ def test_seed_version_upgrade_preserves_user_data_and_is_idempotent(client, app_
     profile = checked(client.get("/api/profiles"))[0]
     checked(client.put(f"/api/profiles/{profile['id']}/skills", json={"skills": ["LegacySkill"]}, headers=STUDENT))
     checked(client.post(f"/api/quests/{user_task['id']}/decision", json={"profileId": profile["id"], "decision": "saved"}, headers=STUDENT))
-    source_ids = list(checked(client.get("/api/demo-data"))["apiIds"].values())
+    source_mapping = checked(client.get("/api/demo-data"))["apiIds"]
+    source_ids = [source_mapping[record["id"]] for section in ("drafts", "task_cards") for record in dataset()[section]]
     # Simulate the prior schema's seed marker only inside this test's database.
     # There are no decisions for removed fixtures, only for the preserved user task.
     with sqlite3.connect(app_db_path) as connection:

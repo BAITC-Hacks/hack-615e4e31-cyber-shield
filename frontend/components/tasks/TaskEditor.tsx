@@ -11,6 +11,7 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { api } from "@/lib/api";
 import { EMPTY_FIELDS, SKILLS, TOPICS, type Rating, type Task, type TaskFields, type TaskInput } from "@/lib/contracts";
 import RatingPanel from "./RatingPanel";
+import { FieldQualityHint } from "./QualityReview";
 import AIAssistant from "./AIAssistant";
 
 type Props = { task: Task | null; onClose: () => void; onSaved: (task: Task) => void; onDirtyChange?: (dirty: boolean) => void };
@@ -164,10 +165,12 @@ function TaskEditorForm({ task, onClose, onSaved, onDirtyChange }: Props) {
   }
 
   function textField(key: keyof TaskFields, label: string, placeholder: string, hint?: string) {
+    const quality = !previewPending && !previewError ? preview?.quality?.fields.find((item) => item.field === key) : undefined;
     return <div className="ha-task-field" key={key}>
       <label htmlFor={`task-${key}`}>{label}</label>
-      <Textarea id={`task-${key}`} value={fields[key]} onChange={(event) => updateField(key, event.target.value)} placeholder={placeholder} rows={3} maxLength={6000} disabled={!!saving} />
+      <Textarea id={`task-${key}`} value={fields[key]} onChange={(event) => updateField(key, event.target.value)} placeholder={placeholder} rows={3} maxLength={6000} disabled={!!saving} aria-describedby={quality && quality.status !== "missing" ? `quality-${key}` : undefined} />
       {hint && <p className="ha-task-field-hint">{hint}</p>}
+      <FieldQualityHint result={quality} id={`quality-${key}`} />
     </div>;
   }
 

@@ -1,0 +1,2 @@
+# PDF cross-reference tables contain meaningful trailing bytes.
+*.pdf binary

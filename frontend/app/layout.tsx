@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import "@/components/tasks/tasks.css";
+import "./reference-theme.css";
 
 export const metadata: Metadata = {
   title: "Alem — задачи бизнеса, практика для студентов",

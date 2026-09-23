@@ -1,0 +1,209 @@
+/* A quiet, spacious catalog inspired by the AI-Sana roadmap.
+   Alem keeps its own palette, content, and navigation. */
+.workspace {
+  background-color: #f7f8fc;
+  background-image:
+    radial-gradient(circle at 18px 26px, #5b6bc41a 1px, transparent 1.8px),
+    radial-gradient(circle at 102px 104px, #5b6bc410 1px, transparent 1.8px);
+  background-size: 190px 190px;
+}
+
+.topbar {
+  height: 78px;
+  background: #ffffffed;
+  border-bottom-color: #e5e8f3;
+}
+
+.brand-symbol { border-radius: 13px; }
+.alem-sidebar [data-slot="sidebar-menu-button"] { border-radius: 12px; }
+.alem-sidebar [data-active="true"] { background: #edf0fc; color: #4d5cae; }
+.sidebar-note { border-radius: 20px; background: #f7f8fc; }
+.role-switch { border-radius: 12px; }
+.role-switch [role="tab"] { border-radius: 8px; }
+
+.main-content {
+  max-width: 1540px;
+  padding: 46px 40px 36px;
+}
+
+.page-heading {
+  position: relative;
+  flex-direction: column;
+  align-items: center;
+  gap: 23px;
+  text-align: center;
+  padding: 9px 40px 18px;
+  margin-bottom: 31px;
+}
+
+.page-heading::before,
+.page-heading::after {
+  content: "";
+  position: absolute;
+  width: 15px;
+  height: 15px;
+  background: #5b6bc4;
+  opacity: .27;
+  clip-path: polygon(50% 0, 61% 38%, 100% 50%, 61% 62%, 50% 100%, 39% 62%, 0 50%, 39% 38%);
+  pointer-events: none;
+}
+
+.page-heading::before { left: 8%; top: 23px; }
+.page-heading::after { right: 9%; bottom: 32px; width: 10px; height: 10px; }
+.page-heading .eyebrow { color: #6977ba; letter-spacing: .17em; font-size: 11px; margin-bottom: 17px; }
+.page-heading h1 {
+  color: #1a2250;
+  font-size: clamp(40px, 4.5vw, 66px);
+  font-weight: 730;
+  line-height: 1.13;
+  letter-spacing: -2.5px;
+  text-wrap: balance;
+}
+.hero-emphasis { color: #5b6bc4; font-style: italic; font-weight: 650; }
+.page-heading .heading-dot { color: #5b6bc4; }
+.page-heading p {
+  max-width: 550px;
+  margin: 17px auto 0;
+  color: #6b7491;
+  font-size: 15px;
+  line-height: 1.8;
+  text-wrap: balance;
+}
+.primary-button, .profile-button { min-height: 44px; border-radius: 13px; padding: 0 19px; }
+.primary-button { box-shadow: 0 5px 15px #5b6bc420; }
+.profile-button { border-color: #dee3f4; }
+
+.overview {
+  border-radius: 21px;
+  border-color: #e6e8f3;
+  background: #ffffffeb;
+  box-shadow: 0 4px 18px #1a225003;
+  padding: 23px 26px;
+  margin-bottom: 25px;
+}
+.overview-icon { border-radius: 15px; background: #eef0fc; }
+.overview-stat strong { color: #5b6bc4; font-size: 28px; }
+.skills-strip { margin-top: 0; margin-bottom: 24px; }
+.skill-tag, .card-skills span { border-radius: 8px; }
+
+.filters { gap: 13px; margin-bottom: 26px; }
+.search-field input {
+  height: 54px;
+  border-radius: 16px;
+  border-color: #e1e5f2;
+  padding-left: 48px;
+  font-size: 14px;
+  box-shadow: 0 4px 16px #1a225004;
+}
+.search-field > svg { left: 18px; top: 18px; color: #7d87ab; }
+.search-field > button { top: 19px; right: 16px; }
+.filter-select {
+  height: 54px !important;
+  border-radius: 16px;
+  border-color: #e1e5f2;
+  padding: 0 16px;
+}
+.results-heading { margin-bottom: 19px; color: #687390; }
+.results-heading > span:first-child { font-weight: 600; }
+
+.task-grid { gap: 22px; }
+.task-card {
+  border-radius: 23px;
+  border-color: #e4e7f2;
+  padding: 24px 24px 0;
+  box-shadow: 0 5px 22px #1a225004;
+  transition: border-color .15s ease, box-shadow .15s ease;
+}
+.task-card:hover {
+  border-color: #bbc5ec;
+  box-shadow: 0 9px 28px #1a225009;
+  transform: none;
+}
+.priority-card { border-color: #c5cdf0; }
+.card-rating { order: -1; margin: 0 0 21px; }
+.card-rating > div:first-child { margin-bottom: 11px; }
+.card-rating span { color: #7b85a8; font-size: 10px; font-weight: 650; letter-spacing: .095em; text-transform: uppercase; }
+.card-rating strong { color: #5b6bc4; font-size: 13px; }
+.card-rating small { font-size: 11px; color: #8b94ae; }
+.card-rating [data-slot="progress"] { height: 3px; border-radius: 2px; }
+.card-rating [data-slot="progress-indicator"] { background: #8795df; }
+.priority-card .card-rating [data-slot="progress-indicator"] { background: #5b6bc4; }
+.card-top { display: grid; grid-template-columns: 37px minmax(0, 1fr); gap: 11px; margin-bottom: 17px; }
+.company-mark { width: 37px; height: 37px; border-radius: 12px; }
+.company-info strong { color: #556180; }
+.company-info > span { color: #838ca4; }
+.readiness-badge { grid-column: 1 / -1; justify-self: start; margin-left: 0; border-radius: 7px; font-size: 11px; padding: 4px 8px; }
+.task-title h2 { font-size: 19px; font-weight: 650; line-height: 1.45; letter-spacing: -.3px; text-wrap: balance; }
+.task-description { line-height: 1.75; margin-top: 12px; margin-bottom: 19px; color: #727c96; }
+.card-skills { margin-top: auto; margin-bottom: 22px; }
+.card-skills span { color: #6e7998; background: #f7f8fc; border-color: #edf0f7; }
+.card-bottom { padding: 17px 0; flex-wrap: wrap; row-gap: 10px; }
+.card-bottom > span { font-size: 11px; }
+.card-bottom > button { margin-left: auto; }
+.catalog-footnote { color: #7f89a3; padding-top: 30px; }
+.empty-state, .card-skeleton { border-radius: 23px; }
+.ha-task-card { border-radius: 20px; }
+.ha-task-form-card { box-shadow: 0 5px 22px #1a225004; }
+.ha-task-step-nav .ha-task-step { border-radius: 11px; }
+.quest-preview { border-radius: 18px; }
+.quest-emblem { border-radius: 21px; }
+
+@media (min-width: 1280px) {
+  .task-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+
+@media (min-width: 981px) and (max-width: 1279px) {
+  .task-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .task-card { padding: 22px 21px 0; }
+}
+
+@media (max-width: 1190px) {
+  .main-content { padding: 34px 25px 30px; }
+  .page-heading { padding-left: 20px; padding-right: 20px; }
+  .page-heading h1 { font-size: 50px; letter-spacing: -2px; }
+  .overview { padding: 21px; }
+}
+
+@media (max-width: 980px) {
+  .page-heading p { max-width: 490px; }
+  .filters { flex-wrap: wrap; gap: 11px; }
+  .filter-select { min-width: 0; flex: 1; }
+  .task-card { padding: 25px 25px 0; }
+}
+
+@media (max-width: 767px) {
+  .topbar { height: 72px; padding: 0 17px; }
+  .main-content { padding: 31px 18px 28px; }
+  .page-heading { align-items: center; padding: 10px 0 11px; gap: 21px; margin-bottom: 25px; }
+  .page-heading h1 { font-size: clamp(35px, 9.8vw, 52px); letter-spacing: -1.5px; }
+  .page-heading .eyebrow { font-size: 10px; margin-bottom: 14px; }
+  .page-heading p { font-size: 14px; line-height: 1.75; max-width: 340px; margin-top: 15px; }
+  .page-heading::before { left: 0; top: 2px; width: 9px; height: 9px; }
+  .page-heading::after { right: 3px; bottom: 12px; width: 8px; height: 8px; }
+  .overview { padding: 19px 17px; gap: 13px; border-radius: 18px; }
+  .overview-title { gap: 12px; }
+  .overview-title p { max-width: none; }
+  .skills-strip { gap: 6px; margin-bottom: 21px; }
+  .skills-strip > span:first-child { width: 100%; margin-bottom: 3px; }
+  .filters { margin-bottom: 23px; }
+  .search-field input { height: 52px; border-radius: 14px; font-size: 13px; }
+  .search-field > svg { top: 17px; }
+  .search-field > button { top: 18px; }
+  .filter-select { height: 46px !important; border-radius: 13px; padding: 0 11px; font-size: 12px; }
+  .task-grid { gap: 18px; }
+  .task-card { padding: 22px 22px 0; border-radius: 21px; }
+  .card-rating { margin-bottom: 20px; }
+  .task-title h2 { font-size: 20px; }
+  .catalog-footnote { padding-top: 25px; }
+}
+
+@media (max-width: 380px) {
+  .main-content { padding-left: 14px; padding-right: 14px; }
+  .task-card { padding: 20px 19px 0; }
+  .filter-select { flex-basis: 100%; }
+  .results-heading { flex-wrap: wrap; gap: 7px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .task-card { transition: none; }
+}

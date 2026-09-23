@@ -59,11 +59,28 @@ class RatingItem(APIModel):
     missing: list[str]
 
 
+class QualityField(APIModel):
+    field: str
+    status: Literal["missing", "needs_work", "ready"]
+    message: str
+    suggestion: str
+
+
+class QualityReport(APIModel):
+    version: str
+    mode: Literal["rules"] = "rules"
+    fields: list[QualityField]
+    eligibleFields: list[str]
+    summary: str
+
+
 class Rating(APIModel):
     score: int
     level: Readiness
     breakdown: list[RatingItem]
     missingFields: list[str]
+    # Old persisted snapshots are read before the store migrates derived values.
+    quality: QualityReport | None = None
 
 
 class Task(TaskInput):

@@ -20,7 +20,9 @@ export type TaskInput = {
   requiredSkills: string[];
 };
 export type RatingItem = { key: string; label: string; earned: number; max: number; missing: string[] };
-export type Rating = { score: number; level: Readiness; breakdown: RatingItem[]; missingFields: string[] };
+export type QualityField = { field: string; status: "missing" | "needs_work" | "ready"; message: string; suggestion: string };
+export type QualityReport = { version: string; mode: "rules"; fields: QualityField[]; eligibleFields: string[]; summary: string };
+export type Rating = { score: number; level: Readiness; breakdown: RatingItem[]; missingFields: string[]; quality?: QualityReport };
 export type Task = TaskInput & {
   id: string;
   published: boolean;
@@ -37,6 +39,16 @@ export type Task = TaskInput & {
   confirmedFields?: string[] | null;
 };
 export type StudentProfile = { id: string; name: string; course: string; skills: string[]; interests: string[] };
+export type Team = { id: string; sourceId?: string | null; name: string; skills: string[]; technologies: string[]; interests: string[] };
+export type ProposalStatus = "submitted" | "accepted" | "rejected";
+export type ProposalInput = { teamId: string; idea: string; plan: string[]; durationDays: number; prototypeUrl: string; assumptions: string[] };
+export type ProposalAttachment = { id: string; name: string; size: number; mediaType: "application/pdf"; createdAt: string };
+export type Proposal = ProposalInput & {
+  id: string; sourceId?: string | null; taskId: string; team: Team;
+  prototypeIsPlaceholder: boolean; status: ProposalStatus; decisionComment: string;
+  createdAt: string; updatedAt: string; taskTitle: string;
+  attachments: ProposalAttachment[];
+};
 export type Quest = { task: Task; matchedSkills: string[]; matchedInterests: string[]; decision: "saved" | "dismissed" | null };
 export type AIMode = "local_stub" | "openai";
 export type AIQuestion = { id: string; field: keyof TaskFields; question: string };

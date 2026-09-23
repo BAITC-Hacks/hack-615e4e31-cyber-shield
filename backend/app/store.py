@@ -98,7 +98,11 @@ class Store:
 
                 seed_database(connection)
                 connection.execute("INSERT OR REPLACE INTO metadata(key, value) VALUES (?, ?)", ("seed_version", "2"))
-                # Existing demo/user cards remain intact; only their derived scores change.
+            from .quality import QUALITY_VERSION
+
+            rating_version = connection.execute("SELECT value FROM metadata WHERE key = ?", ("rating_version",)).fetchone()
+            if rating_version is None or rating_version["value"] != str(QUALITY_VERSION):
+                # Recalculate each snapshot from its own fields. Never publish draft edits.
                 for row in connection.execute("SELECT id, draft_json, published_json FROM tasks").fetchall():
                     values = []
                     for column in ("draft_json", "published_json"):
@@ -110,6 +114,10 @@ class Store:
                         task.previewRating = calculate_rating(task.fields)
                         values.append(task.model_dump_json())
                     connection.execute("UPDATE tasks SET draft_json = ?, published_json = ? WHERE id = ?", (*values, row["id"]))
+                connection.execute("INSERT OR REPLACE INTO metadata(key, value) VALUES (?, ?)", ("rating_version", str(QUALITY_VERSION)))
+            from .proposals import initialize_proposals
+
+            initialize_proposals(connection)
 
     @staticmethod
     def _owned_row(connection: sqlite3.Connection, task_id: str) -> sqlite3.Row:

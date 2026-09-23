@@ -3,6 +3,7 @@
 import { Check, CircleHelp, Loader2, Sparkles } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
 import { LEVELS, type Rating } from "@/lib/contracts";
+import QualityReview from "./QualityReview";
 
 export const FIELD_LABELS: Record<string, string> = {
   title: "Название", context: "Контекст", need: "Потребность", users: "Пользователи",
@@ -38,12 +39,12 @@ export default function RatingPanel({ rating, preview = false, loading = false, 
             </div>
           ))}
         </div>
-        <div className="ha-task-rating-tip">
+        {rating.quality ? <QualityReview report={rating.quality} labels={FIELD_LABELS} /> : <div className="ha-task-rating-tip">
           <strong>{rating.missingFields.length ? "Что улучшить" : "Все разделы заполнены"}</strong>
           {rating.missingFields.length ? <ul>{(suggestions.length ? suggestions : rating.missingFields.map((field) => FIELD_LABELS[field] ?? field)).map((suggestion) => <li key={suggestion}>{suggestion}</li>)}</ul> : <p>Все сведения, влияющие на рейтинг, заполнены.</p>}
-        </div>
+        </div>}
       </>}
-      <p className="ha-task-footnote">Баллы отражают полноту описания. Задача с любым рейтингом может попасть в каталог.</p>
+      <p className="ha-task-footnote">Баллы учитывают заполнение, конкретность и подтверждение сведений. Задача с любым рейтингом доступна для публикации и откликов.</p>
     </section>
   );
 }

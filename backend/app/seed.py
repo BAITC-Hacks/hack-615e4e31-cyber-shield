@@ -25,7 +25,7 @@ def load_dataset() -> dict:
 
 def demo_dataset() -> dict:
     data = load_dataset()
-    return {**data, "apiIds": {item["id"]: seed_id(item["id"]) for section in ("drafts", "task_cards") for item in data[section]}}
+    return {**data, "apiIds": {item["id"]: seed_id(item["id"]) for section in ("drafts", "task_cards", "teams", "proposals") for item in data[section]}}
 
 
 def fields(**values: str) -> TaskFields:
@@ -49,8 +49,7 @@ def seed_database(connection: sqlite3.Connection) -> None:
         task.published = source["publication_status"] == "published"
         task.publishedRevision = task.revision if task.published else None
         task.rating = calculate_rating(task.fields, confirmed=task.confirmed, confirmed_fields=task.confirmedFields)
-        if task.rating.score != source["rating"]["total"]:
-            raise ValueError(f"Dataset rating mismatch: {source['id']}")
+        # The source keeps its original rating; the application uses its current formula.
         connection.execute("INSERT OR IGNORE INTO tasks(id, owner_id, draft_json, published_json) VALUES (?, ?, ?, ?)", (task.id, DEMO_OWNER, task.model_dump_json(), task.model_dump_json() if task.published else None))
     for source in data["drafts"]:
         card = cards[source["card_id"]]

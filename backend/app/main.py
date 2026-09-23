@@ -14,6 +14,7 @@ from .domain import calculate_rating
 from .ai import router as ai_router
 from .models import DecisionInput, Quest, Rating, RatingInput, Readiness, SkillsInput, StudentProfile, Task, TaskInput
 from .store import Store, StoreError
+from .proposals import router as proposals_router
 
 DemoRole = Annotated[str | None, Header(alias="X-Demo-Role")]
 
@@ -39,6 +40,7 @@ def create_app(db_path: str | Path | None = None) -> FastAPI:
 
     application = FastAPI(title="HackAlem · часть 1", version="1.0.0", lifespan=lifespan)
     application.include_router(ai_router, dependencies=[Depends(require_business)])
+    application.include_router(proposals_router)
     application.state.store = store
     application.add_middleware(
         CORSMiddleware,
