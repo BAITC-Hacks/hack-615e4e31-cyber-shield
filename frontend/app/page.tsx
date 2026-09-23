@@ -41,6 +41,7 @@ export default function Home() {
   const [detail, setDetail] = useState<Task | null>(null);
   const [editor, setEditor] = useState<Task | "new" | null>(null);
   const [editorDirty, setEditorDirty] = useState(false);
+  const [editorBusy, setEditorBusy] = useState(false);
   const [teamId, setTeamId] = useState("");
   const [proposalTaskId, setProposalTaskId] = useState("");
   const [proposalDirty, setProposalDirty] = useState(false);
@@ -93,14 +94,14 @@ export default function Home() {
   }, [role, profileId, skillsKey]);
 
   useEffect(() => {
-    if (!editorDirty && !proposalDirty && !detailDirty && !proposalBusy && !detailBusy && !rewardBusy) return;
+    if (!editorDirty && !editorBusy && !proposalDirty && !detailDirty && !proposalBusy && !detailBusy && !rewardBusy) return;
     const warn = (event: BeforeUnloadEvent) => { event.preventDefault(); event.returnValue = ""; };
     window.addEventListener("beforeunload", warn);
     return () => window.removeEventListener("beforeunload", warn);
-  }, [editorDirty, proposalDirty, detailDirty, proposalBusy, detailBusy, rewardBusy]);
+  }, [editorDirty, editorBusy, proposalDirty, detailDirty, proposalBusy, detailBusy, rewardBusy]);
 
   function leaveWorkspace(action: () => void) {
-    if (proposalBusy || detailBusy || rewardBusy || busy) { toast.info("Дождитесь завершения сохранения."); return; }
+    if (editorBusy || proposalBusy || detailBusy || rewardBusy || busy) { toast.info("Дождитесь завершения текущего действия."); return; }
     if ((editor && editorDirty) || proposalDirty || detailDirty) {
       setPendingNavigation(() => () => { setProposalDirty(false); setDetailDirty(false); setProposalEpoch((value) => value + 1); action(); });
     } else action();
@@ -114,7 +115,7 @@ export default function Home() {
   function showProposals(taskId: string) {
     leaveWorkspace(() => { closeDetail(); closeEditor(); setProposalTaskId(taskId); setView("proposals"); });
   }
-  function closeEditor() { setEditor(null); setEditorDirty(false); }
+  function closeEditor() { setEditor(null); setEditorDirty(false); setEditorBusy(false); }
   function changeRole(value: string) { leaveWorkspace(() => { setRole(value as Role); setView("catalog"); setSearch(""); setTopic("all"); setReadiness("all"); closeDetail(); closeEditor(); setQuest(null); }); }
   function navigate(next: View) { leaveWorkspace(() => { setView(next); closeDetail(); closeEditor(); setSearch(""); setTopic("all"); setReadiness("all"); }); }
   async function saveTask(task: Task) {
@@ -154,7 +155,7 @@ export default function Home() {
       <SidebarFooter className="sidebar-bottom"><button className="help-link" onClick={() => setHelpOpen(true)}><CircleHelp size={18}/> О платформе и рейтинге</button><div className="sidebar-user"><span className="user-avatar">{role === "business" ? "Б" : profile?.name.charAt(0) || "С"}</span><span><strong>{role === "business" ? "Бизнесмен" : profile?.name || "Студент"}</strong><small>Тестовый профиль</small></span><span className="demo-dot" title="Демо-режим"/></div></SidebarFooter>
     </Sidebar>
     <SidebarInset className="workspace"><header className="topbar"><div className="breadcrumb"><SidebarTrigger className="mobile-menu" aria-label="Открыть меню"/><span>Рабочее пространство</span><ChevronRight size={14}/><strong>{editor ? "Конструктор задачи" : viewTitle}</strong></div><div className="role-area"><span className="role-label">Тестовая роль</span><Tabs value={role} onValueChange={changeRole}><TabsList className="role-switch"><TabsTrigger value="business"><BriefcaseBusiness size={15}/>Бизнесмен</TabsTrigger><TabsTrigger value="student"><GraduationCap size={16}/>Студент</TabsTrigger></TabsList></Tabs></div></header>
-      <section className="main-content" aria-label="Работа с задачами">{editor ? <TaskEditor task={editor === "new" ? null : editor} onDirtyChange={setEditorDirty} onClose={() => { closeEditor(); setView("mine"); }} onSaved={() => { closeEditor(); setView("mine"); refresh(); }}/> : view === "rewards" && role === "student" ? <RewardsPage key={teamId} teamId={teamId} onTeamChange={(id) => leaveWorkspace(() => setTeamId(id))} onBusyChange={setRewardBusy} onCatalog={() => navigate("catalog")} /> : view === "proposals" ? <ProposalsPage key={`${role}:${proposalEpoch}`} revision={proposalRevision} role={role} tasks={tasks} loading={loading} error={error} onRetry={refresh} taskId={proposalTaskId} onTaskChange={(id) => leaveWorkspace(() => setProposalTaskId(id))} teamId={teamId} onTeamChange={(id) => leaveWorkspace(() => setTeamId(id))} dirty={proposalDirty} busy={proposalBusy} onDirtyChange={setProposalDirty} onBusyChange={setProposalBusy} onOpenTask={openTask} onCatalog={() => navigate("catalog")} /> : <>
+      <section className="main-content" aria-label="Работа с задачами">{editor ? <TaskEditor task={editor === "new" ? null : editor} onDirtyChange={setEditorDirty} onBusyChange={setEditorBusy} onClose={() => { closeEditor(); setView("mine"); }} onSaved={() => { closeEditor(); setView("mine"); refresh(); }}/> : view === "rewards" && role === "student" ? <RewardsPage key={teamId} teamId={teamId} onTeamChange={(id) => leaveWorkspace(() => setTeamId(id))} onBusyChange={setRewardBusy} onCatalog={() => navigate("catalog")} /> : view === "proposals" ? <ProposalsPage key={`${role}:${proposalEpoch}`} revision={proposalRevision} role={role} tasks={tasks} loading={loading} error={error} onRetry={refresh} taskId={proposalTaskId} onTaskChange={(id) => leaveWorkspace(() => setProposalTaskId(id))} teamId={teamId} onTeamChange={(id) => leaveWorkspace(() => setTeamId(id))} dirty={proposalDirty} busy={proposalBusy} onDirtyChange={setProposalDirty} onBusyChange={setProposalBusy} onOpenTask={openTask} onCatalog={() => navigate("catalog")} /> : <>
         <div className="page-heading"><div><div className="eyebrow">{role === "business" ? "ДЛЯ БИЗНЕСА" : "ДЛЯ СТУДЕНТОВ"}</div><h1>{viewTitle.split(" ").slice(0, -1).join(" ")} <em className="hero-emphasis">{viewTitle.split(" ").at(-1)}</em><span className="heading-dot">.</span></h1><p>{subtitle}</p></div>{role === "business" ? <Button className="primary-button" onClick={() => setEditor("new")}><Plus size={18}/>Создать задачу</Button> : <Button variant="outline" className="profile-button" onClick={() => { setSkillDraft(profile?.skills ?? []); setProfileOpen(true); }}><SlidersHorizontal size={17}/>Мои навыки</Button>}</div>
         <section className="overview" aria-label="Обзор задач"><div className="overview-title"><span className="overview-icon"><Compass size={23}/></span><div><strong>{role === "business" ? "От идеи к совместной работе" : "Ваша следующая практика — здесь"}</strong><p>{role === "business" ? "Расскажите о задаче. Студенты найдут, где принести пользу." : "Выбирайте по интересам. Сохраняйте задачи, которые подходят."}</p></div></div><div className="overview-stat"><strong>{loading ? "—" : tasks.length.toString().padStart(2, "0")}</strong><span>{view === "saved" ? "сохранено" : "задач в разделе"}</span></div><div className="overview-stat"><strong>{loading ? "—" : (role === "student" ? matchCount : priorities).toString().padStart(2, "0")}</strong><span>{role === "student" ? "по вашему профилю" : "готовы к старту"}</span></div></section>
         {role === "student" && profile && <div className="skills-strip"><span><Sparkles size={15}/>Ваши навыки</span>{profile.skills.slice(0, 5).map((skill) => <span className="skill-tag" key={skill}>{skill}</span>)}<button onClick={() => { setSkillDraft(profile.skills); setProfileOpen(true); }}>Изменить</button></div>}

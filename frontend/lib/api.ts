@@ -1,4 +1,4 @@
-import type { AIAnalysis, AIAnswer, AICardResult, Proposal, ProposalInput, ProposalStatus, Quest, Rating, RewardSlot, Role, StudentProfile, Task, TaskFields, TaskInput, Team, TeamRewards } from "./contracts";
+import type { AIAnalysis, AIAnswer, AICardResult, AIExpandedDescription, Proposal, ProposalInput, ProposalStatus, Quest, Rating, RewardSlot, Role, StudentProfile, Task, TaskFields, TaskInput, Team, TeamRewards } from "./contracts";
 
 async function request<T>(path: string, options: RequestInit = {}, role?: Role): Promise<T> {
   let response: Response;
@@ -31,6 +31,7 @@ export const api = {
   ratingStatus: () => request<{ configured: boolean; model: string }>("/ai/status", {}, "business"),
   analyzeTask: (description: string, fields: TaskFields) => request<AIAnalysis>("/ai/analyze", { method: "POST", body: JSON.stringify({ description, fields }) }, "business"),
   buildTaskCard: (description: string, fields: TaskFields, answers: AIAnswer[]) => request<AICardResult>("/ai/build-card", { method: "POST", body: JSON.stringify({ description, fields, answers }) }, "business"),
+  expandDescription: (description: string, signal?: AbortSignal) => request<AIExpandedDescription>("/ai/expand-description", { method: "POST", body: JSON.stringify({ description }), signal: signal ? AbortSignal.any([signal, AbortSignal.timeout(60000)]) : AbortSignal.timeout(60000) }, "business"),
   profiles: () => request<StudentProfile[]>("/profiles"),
   teams: () => request<Team[]>("/teams"),
   submitProposal: (taskId: string, input: ProposalInput) => request<Proposal>(`/tasks/${encodeURIComponent(taskId)}/proposals`, { method: "POST", body: JSON.stringify(input) }, "student"),

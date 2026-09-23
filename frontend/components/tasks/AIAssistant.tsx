@@ -8,6 +8,7 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/component
 import { api } from "@/lib/api";
 import { EMPTY_FIELDS, type AIAnalysis, type AIAnswer, type AICardResult, type AIMode, type TaskFields } from "@/lib/contracts";
 import { FIELD_LABELS } from "./RatingPanel";
+import DescriptionExpander from "./DescriptionExpander";
 
 type Props = {
   fields: TaskFields;
@@ -15,6 +16,8 @@ type Props = {
   disabled: boolean;
   onApply: (fields: TaskFields, expectedSnapshot: string) => boolean;
   onDirtyChange?: (dirty: boolean) => void;
+  onBusyChange?: (busy: boolean) => void;
+  onSourceChange?: () => void;
 };
 type AnalysisState = { result: AIAnalysis; inputKey: string };
 type ProposalState = { result: AICardResult; inputKey: string; formSnapshot: string; answers: AIAnswer[] };
@@ -37,7 +40,7 @@ function validCard(value: AICardResult) {
     && Array.isArray(value.warnings) && value.warnings.every((warning) => typeof warning === "string");
 }
 
-export default function AIAssistant({ fields, formSnapshot, disabled, onApply, onDirtyChange }: Props) {
+export default function AIAssistant({ fields, formSnapshot, disabled, onApply, onDirtyChange, onBusyChange, onSourceChange }: Props) {
   const [open, setOpen] = useState(false);
   const [description, setDescription] = useState("");
   const [analysis, setAnalysis] = useState<AnalysisState | null>(null);
@@ -47,11 +50,16 @@ export default function AIAssistant({ fields, formSnapshot, disabled, onApply, o
   const [error, setError] = useState<string | null>(null);
   const [failedAction, setFailedAction] = useState<"analyze" | "build" | null>(null);
   const [applied, setApplied] = useState(false);
+  const [expanding, setExpanding] = useState(false);
+  const [expansionDirty, setExpansionDirty] = useState(false);
   const mounted = useRef(true);
   const requestVersion = useRef(0);
   const busyLock = useRef(false);
   const reportedDirty = useRef<boolean | null>(null);
-  const dirty = !applied && (!!description.trim() || Object.values(answers).some((answer) => !!answer.trim()));
+  const reportedBusy = useRef<boolean | null>(null);
+  const busyCallback = useRef(onBusyChange);
+  const working = !!busy || expanding;
+  const dirty = expansionDirty || (!applied && (!!description.trim() || Object.values(answers).some((answer) => !!answer.trim())));
   const inputKey = JSON.stringify({ description, formSnapshot });
   const analysisCurrent = analysis?.inputKey === inputKey;
   const proposalCurrent = proposal?.inputKey === inputKey;
@@ -66,9 +74,14 @@ export default function AIAssistant({ fields, formSnapshot, disabled, onApply, o
     }
   }, [dirty, onDirtyChange]);
 
+  useEffect(() => { busyCallback.current = onBusyChange; }, [onBusyChange]);
+  useEffect(() => {
+    if (reportedBusy.current !== working) { reportedBusy.current = working; onBusyChange?.(working); }
+  }, [working, onBusyChange]);
+
   useEffect(() => {
     mounted.current = true;
-    return () => { mounted.current = false; requestVersion.current += 1; };
+    return () => { mounted.current = false; requestVersion.current += 1; busyCallback.current?.(false); };
   }, []);
   useEffect(() => { requestVersion.current += 1; }, [formSnapshot]);
 
@@ -81,6 +94,7 @@ export default function AIAssistant({ fields, formSnapshot, disabled, onApply, o
     setError(null);
     setFailedAction(null);
     setApplied(false);
+    onSourceChange?.();
   }
   function changeAnswer(id: string, value: string) {
     requestVersion.current += 1;
@@ -92,7 +106,7 @@ export default function AIAssistant({ fields, formSnapshot, disabled, onApply, o
   }
 
   async function run(action: "analyze" | "build") {
-    if (disabled || busyLock.current) return;
+    if (disabled || busyLock.current || expanding) return;
     if (!description.trim()) { setError("Сначала коротко опишите свою задачу."); return; }
     if (action === "build" && !analysisCurrent) { setError("Карточка изменилась. Сначала обновите уточняющие вопросы."); return; }
     const version = ++requestVersion.current;
@@ -135,7 +149,7 @@ export default function AIAssistant({ fields, formSnapshot, disabled, onApply, o
   }
 
   function applyProposal() {
-    if (!proposal || !proposalCurrent || disabled || busyLock.current) return;
+    if (!proposal || !proposalCurrent || disabled || busyLock.current || expanding) return;
     if (!onApply(proposal.result.fields, proposal.formSnapshot)) {
       setError("Карточка изменилась. Соберите новый вариант, чтобы сохранить свои правки.");
       setFailedAction("analyze");
@@ -164,25 +178,30 @@ export default function AIAssistant({ fields, formSnapshot, disabled, onApply, o
     </Button></CollapsibleTrigger>
     <CollapsibleContent className="ha-task-ai-content">
       <p className="ha-task-ai-intro">Расскажите о задаче своими словами. Помощник уточнит недостающие сведения и предложит карточку. Вы проверите её перед переносом.</p>
-      <div className="ha-task-field"><label htmlFor="ai-task-description">Исходное описание</label><Textarea id="ai-task-description" value={description} onChange={(event) => changeDescription(event.target.value)} maxLength={6000} rows={3} disabled={disabled || !!busy} placeholder="Например, хотим сократить время ответа на вопросы клиентов. Сейчас менеджеры отвечают вручную." /></div>
-      <div className="ha-task-ai-actions"><Button type="button" variant="outline" onClick={() => void run("analyze")} disabled={disabled || !!busy || !description.trim()}>{busy === "analyze" ? <Loader2 size={16} className="ha-task-spin" /> : <MessageSquare size={16} />}{analysis ? "Обновить вопросы" : "Уточнить задачу"}</Button><span className="ha-task-field-hint">Текущие поля карточки тоже будут учтены.</span></div>
+      <div className="ha-task-field"><label htmlFor="ai-task-description">Исходное описание</label><Textarea id="ai-task-description" value={description} onChange={(event) => changeDescription(event.target.value)} maxLength={6000} rows={3} disabled={disabled || working} placeholder="Например, хотим сократить время ответа на вопросы клиентов. Сейчас менеджеры отвечают вручную." /></div>
+      <DescriptionExpander source={description} disabled={disabled || !!busy} onBusyChange={setExpanding} onDirtyChange={setExpansionDirty} resetWarning={analysis || proposal || Object.values(answers).some((answer) => answer.trim()) ? "После применения текущие вопросы, ответы и предварительная карточка помощника будут сброшены. Затем запросите уточняющие вопросы заново." : undefined} onApply={(value, expectedSource) => {
+        if (disabled || busyLock.current || description !== expectedSource) return false;
+        changeDescription(value);
+        return true;
+      }} />
+      <div className="ha-task-ai-actions"><Button type="button" variant="outline" onClick={() => void run("analyze")} disabled={disabled || working || !description.trim()}>{busy === "analyze" ? <Loader2 size={16} className="ha-task-spin" /> : <MessageSquare size={16} />}{analysis ? "Обновить вопросы" : "Уточнить задачу"}</Button><span className="ha-task-field-hint">Текущие поля карточки тоже будут учтены.</span></div>
       {busy && <p className="ha-task-inline-status" role="status">{busy === "analyze" ? "Изучаем описание и готовим вопросы…" : "Собираем предварительную карточку…"}</p>}
       {mode && <div className={`ha-task-ai-mode ${mode === "local_stub" ? "ha-task-ai-mode-stub" : ""}`}><Sparkles size={14} />{mode === "local_stub" ? "Резервный режим без внешней AI-модели" : "Ответ внешней AI-модели"}</div>}
       {!!warnings?.length && <ul className="ha-task-ai-warnings">{warnings.map((warning, index) => <li key={`${index}-${warning}`}>{warning}</li>)}</ul>}
       {stale && <p className="ha-task-info">Карточка изменилась после запроса. Обновите вопросы, чтобы помощник учёл последние правки.</p>}
       {analysisCurrent && analysis && <section className="ha-task-ai-questions" aria-label="Уточняющие вопросы">
         <div className="ha-task-ai-subheading"><h3>{analysis.result.questions.length ? "Уточним детали" : "Дополнительных вопросов нет"}</h3><p>{analysis.result.questions.length ? "Если ответа пока нет, оставьте поле пустым. Недостающие факты не будут придуманы." : "Проверьте сведения: можно собрать предварительную карточку или продолжить редактирование вручную."}</p></div>
-        {analysis.result.questions.map((question, index) => <div className="ha-task-field" key={question.id}><label htmlFor={`ai-answer-${index}`}><span className="ha-task-ai-question-number">{index + 1}</span>{question.question}</label><Textarea id={`ai-answer-${index}`} value={answers[question.id] ?? ""} onChange={(event) => changeAnswer(question.id, event.target.value)} maxLength={question.field === "title" ? 200 : question.field === "contact" ? 500 : 6000} rows={2} disabled={disabled || !!busy} placeholder="Ваш ответ" /></div>)}
-        <Button type="button" className="ha-task-primary" onClick={() => void run("build")} disabled={disabled || !!busy}>{busy === "build" ? <Loader2 size={16} className="ha-task-spin" /> : <FileText size={16} />}Собрать предварительную карточку</Button>
+        {analysis.result.questions.map((question, index) => <div className="ha-task-field" key={question.id}><label htmlFor={`ai-answer-${index}`}><span className="ha-task-ai-question-number">{index + 1}</span>{question.question}</label><Textarea id={`ai-answer-${index}`} value={answers[question.id] ?? ""} onChange={(event) => changeAnswer(question.id, event.target.value)} maxLength={question.field === "title" ? 200 : question.field === "contact" ? 500 : 6000} rows={2} disabled={disabled || working} placeholder="Ваш ответ" /></div>)}
+        <Button type="button" className="ha-task-primary" onClick={() => void run("build")} disabled={disabled || working}>{busy === "build" ? <Loader2 size={16} className="ha-task-spin" /> : <FileText size={16} />}Собрать предварительную карточку</Button>
       </section>}
       {proposalCurrent && proposal && <section className="ha-task-ai-proposal" aria-label="Предварительная карточка">
         <div className="ha-task-ai-subheading"><h3>Проверьте предложенную карточку</h3><p>Существующие сведения сохранены. Рядом с заполненными полями — цитаты, из которых собран текст.</p></div>
         <dl className="ha-task-ai-preview">{FIELD_KEYS.map((key) => <div key={key} className="ha-task-ai-preview-field"><dt>{FIELD_LABELS[key]}</dt><dd>{proposal.result.fields[key].trim() || <span className="ha-task-empty-value">Пока не указано</span>}</dd>{!!proposal.result.sources[key]?.length && <details className="ha-task-ai-sources"><summary>Источники · {proposal.result.sources[key].length}</summary>{proposal.result.sources[key].map((source, index) => <blockquote key={`${source.sourceId}-${index}`}><span>{sourceLabel(source.sourceId)}</span><p>«{source.quote}»</p></blockquote>)}</details>}</div>)}</dl>
-        <Button type="button" className="ha-task-primary" onClick={applyProposal} disabled={disabled || !!busy || applied}><ArrowDownToLine size={16} />Перенести в карточку</Button>
+        <Button type="button" className="ha-task-primary" onClick={applyProposal} disabled={disabled || working || applied}><ArrowDownToLine size={16} />Перенести в карточку</Button>
         <p className="ha-task-footnote">Перенос не подтверждает и не публикует задачу. Дальше можно изменить любое поле и сохранить черновик.</p>
       </section>}
       {applied && <p className="ha-task-ai-applied" role="status"><Check size={17} />Сведения перенесены. Проверьте поля ниже и подтвердите карточку перед публикацией.</p>}
-      {error && <div className="ha-task-ai-error"><p className="ha-task-error" role="alert">{error}</p>{failedAction && <Button type="button" variant="outline" size="sm" onClick={() => void run(stale ? "analyze" : failedAction)} disabled={disabled || !!busy}><RotateCcw size={14} />Повторить запрос</Button>}</div>}
+      {error && <div className="ha-task-ai-error"><p className="ha-task-error" role="alert">{error}</p>{failedAction && <Button type="button" variant="outline" size="sm" onClick={() => void run(stale ? "analyze" : failedAction)} disabled={disabled || working}><RotateCcw size={14} />Повторить запрос</Button>}</div>}
     </CollapsibleContent>
   </Collapsible>;
 }

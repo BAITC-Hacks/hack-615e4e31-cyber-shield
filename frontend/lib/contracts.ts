@@ -57,6 +57,7 @@ export type RewardTransaction = { id: string; kind: "project_reward" | "purchase
 export type TeamRewards = { teamId: string; balance: number; totalEarned: number; completedProjects: number; items: RewardItem[]; ownedItemIds: string[]; equipped: Record<RewardSlot, string | null>; history: RewardTransaction[] };
 export type Quest = { task: Task; matchedSkills: string[]; matchedInterests: string[]; decision: "saved" | "dismissed" | null };
 export type AIMode = "local_stub" | "openai";
+export type AIExpandedDescription = { mode: AIMode; description: string; questions: string[]; warnings: string[]; sourceQuotes: string[]; confirmed: false; promptVersion: string };
 export type AIQuestion = { id: string; field: keyof TaskFields; question: string };
 export type AIAnswer = { field: keyof TaskFields; answer: string };
 export type AIAnalysis = { mode: AIMode; missingFields: string[]; questions: AIQuestion[]; warnings: string[]; promptVersion: string };

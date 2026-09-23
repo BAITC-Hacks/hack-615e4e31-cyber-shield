@@ -1,0 +1,34 @@
+.wrapper { margin-top: 2px; }
+.trigger { color: #5b6bc4; border-color: #dce2f5; border-radius: 10px; background: #f7f8ff; font-size: 12px; gap: 7px; }
+.dialog { max-width: min(720px, calc(100% - 2rem)); max-height: calc(100dvh - 40px); overflow-y: auto; border-radius: 23px; padding: 27px; color: #1a2250; gap: 18px; }
+.eyebrow { display: inline-flex; align-items: center; gap: 7px; color: #7281be; font-size: 9px; letter-spacing: 1.2px; margin-bottom: 4px; }
+.dialog [data-slot="dialog-title"] { line-height: 1.4; font-size: 23px; letter-spacing: -.5px; }
+.dialog [data-slot="dialog-description"] { color: #7b86a2; line-height: 1.7; font-size: 12px; }
+.original { padding: 15px 17px; border: 1px solid #e5e9f4; border-radius: 13px; background: #f7f8fc; }
+.original strong { font-size: 11px; display: flex; gap: 7px; align-items: center; font-weight: 650; color: #7b88ad; }
+.original p { margin-top: 9px; font-size: 13px; line-height: 1.8; white-space: pre-wrap; overflow-wrap: anywhere; max-height: 140px; overflow-y: auto; }
+.loading { padding: 20px 16px; border-radius: 13px; background: #f2f4fd; display: flex; gap: 13px; align-items: center; color: #7d8ac0; }
+.loading > svg { flex-shrink: 0; }
+.loading strong { font-size: 13px; font-weight: 600; color: #5667ac; }
+.loading p { font-size: 11px; line-height: 1.6; margin-top: 6px; color: #8993b1; }
+.mode { display: flex; gap: 6px; align-items: center; font-size: 11px; color: #5b6bc4; }
+.mode > svg { flex-shrink: 0; }
+.fallback { color: #a17c43; }
+.proposed { display: grid; gap: 10px; }
+.proposed label { color: #34446f; font-size: 13px; font-weight: 600; }
+.proposed textarea { font-size: 13px; line-height: 1.8; padding: 12px 14px; resize: vertical; min-height: 160px; border-color: #cdd6f2; border-radius: 12px; }
+.proposed small, .note { font-size: 10px; color: #9099af; line-height: 1.7; }
+.questions { background: #f1f4fc; border-radius: 13px; padding: 15px 17px; }
+.questions h3 { font-size: 12px; color: #586aab; display: flex; gap: 7px; align-items: center; font-weight: 600; }
+.questions > p { font-size: 10px; color: #8792af; line-height: 1.7; margin-top: 7px; }
+.questions ul { padding-left: 18px; list-style: disc; margin-top: 10px; }
+.questions li { font-size: 12px; line-height: 1.8; color: #647494; }
+.questions li + li { margin-top: 5px; }
+.sources { font-size: 11px; color: #8b96b1; }
+.sources summary { cursor: pointer; }
+.sources blockquote { white-space: pre-wrap; overflow-wrap: anywhere; border-left: 2px solid #d4dcf1; padding-left: 12px; margin-top: 12px; line-height: 1.8; color: #7888aa; }
+.warnings { list-style: disc; padding-left: 18px; color: #8e7854; font-size: 11px; line-height: 1.8; }
+.info { background: #fcf7ed; border: 1px solid #f0e5cc; border-radius: 11px; padding: 12px 15px; color: #957c4e; font-size: 11px; line-height: 1.8; }
+.error { background: #fff1f1; border: 1px solid #f0d7d9; border-radius: 11px; padding: 12px 15px; color: #a45259; font-size: 12px; line-height: 1.7; }
+.error button { margin-top: 10px; }
+@media (max-width: 560px) { .dialog { padding: 22px; } .dialog [data-slot="dialog-title"] { font-size: 21px; } .trigger { height: auto; min-height: 34px; white-space: normal; text-align: left; } .dialog [data-slot="dialog-footer"] button { min-height: 38px; height: auto; white-space: normal; } }
